@@ -1,4 +1,4 @@
-#include "IAppTimer.hpp"
+#include "ISkyTimer.hpp"
 
 IAppTimer::IAppTimer(std::function<void (void)> _exec):
     exec(_exec)

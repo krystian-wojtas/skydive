@@ -6,7 +6,7 @@
 
 #include "ICommAction.hpp"
 
-#include "IAppCommInterface.hpp"
+#include "ISkyCommInterface.hpp"
 
 #include <atomic>
 

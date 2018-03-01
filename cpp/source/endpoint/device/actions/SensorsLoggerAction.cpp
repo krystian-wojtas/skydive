@@ -2,7 +2,7 @@
 
 #include "AppAction.hpp"
 
-#include "UserUavEvent.hpp"
+#include "OperatorEvent.hpp"
 
 SensorsLoggerAction::SensorsLoggerAction(Listener* const _listener):
     ICommAction(_listener)

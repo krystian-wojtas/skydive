@@ -1,7 +1,7 @@
 #include "ICommAction.hpp"
 
-#include "UserUavEvent.hpp"
-#include "Exception.hpp"
+#include "OperatorEvent.hpp"
+#include "SkyException.hpp"
 
 #include <memory>
 

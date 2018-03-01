@@ -2,7 +2,7 @@
 
 #include "IdleAction.hpp"
 
-#include "Exception.hpp"
+#include "SkyException.hpp"
 
 DisconnectAction::DisconnectAction(Listener* const _listener):
     ICommAction(_listener)

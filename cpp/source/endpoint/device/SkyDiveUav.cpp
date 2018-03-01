@@ -1,8 +1,8 @@
-#include "SkyDiveUav.hpp"
+#include "SkyDevice.hpp"
 
-#include "Exception.hpp"
+#include "SkyException.hpp"
 
-#include "UserUavEvent.hpp"
+#include "OperatorEvent.hpp"
 
 #include "IdleAction.hpp"
 

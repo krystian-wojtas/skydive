@@ -4,11 +4,11 @@
 #ifndef ISKYDIVEMONITOR_HPP
 #define ISKYDIVEMONITOR_HPP
 
-#include "IAppTimer.hpp"
+#include "ISkyTimer.hpp"
 
 #include "IMessage.hpp"
 
-#include "UavEvent.hpp"
+#include "DeviceEvent.hpp"
 #include "ControlData.hpp"
 
 #include <string>

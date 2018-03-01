@@ -3,10 +3,10 @@
 
 #include "ISignalPayloadMessage.hpp"
 
-#include "IAppCommInterface.hpp"
+#include "ISkyCommInterface.hpp"
 #include "ICommAction.hpp"
 
-#include "Exception.hpp"
+#include "SkyException.hpp"
 
 #include <string>
 

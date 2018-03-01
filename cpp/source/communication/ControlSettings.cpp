@@ -2,7 +2,7 @@
 
 #ifdef __SKYDIVE_USE_STL__
 
-#include "Exception.hpp"
+#include "SkyException.hpp"
 
 #endif // __SKYDIVE_USE_STL__
 

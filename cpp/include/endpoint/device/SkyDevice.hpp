@@ -4,11 +4,11 @@
 #ifndef SKYDIVEUAV_HPP
 #define SKYDIVEUAV_HPP
 
-#include "UavEvent.hpp"
-#include "UserUavEvent.hpp"
+#include "DeviceEvent.hpp"
+#include "OperatorEvent.hpp"
 
-#include "IAppCommInterface.hpp"
-#include "ISkyDiveMonitor.hpp"
+#include "ISkyCommInterface.hpp"
+#include "ISkyDeviceMonitor.hpp"
 
 #include "ICommAction.hpp"
 

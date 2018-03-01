@@ -3,7 +3,7 @@
 #include "AppAction.hpp"
 #include "FlightAction.hpp"
 
-#include "Exception.hpp"
+#include "SkyException.hpp"
 
 FlightInitializationAction::FlightInitializationAction(Listener* const _listener):
     ICommAction(_listener)

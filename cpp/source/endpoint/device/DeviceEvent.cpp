@@ -1,7 +1,7 @@
 // =========== roboLib ============
 // ===  *** BARTOSZ NAWROT ***  ===
 // ================================
-#include "UavEvent.hpp"
+#include "DeviceEvent.hpp"
 
 UavEvent::UavEvent(const Type& _type):
     type(_type)

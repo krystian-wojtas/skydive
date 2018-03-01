@@ -6,9 +6,9 @@
 
 #include "IMessage.hpp"
 
-#include "ISkyDiveMonitor.hpp"
+#include "ISkyDeviceMonitor.hpp"
 
-#include "IAppCommInterface.hpp"
+#include "ISkyCommInterface.hpp"
 
 #include <atomic>
 #include <memory>

@@ -1,6 +1,6 @@
 #include "ConnectAction.hpp"
 
-#include "Exception.hpp"
+#include "SkyException.hpp"
 
 #include "AppAction.hpp"
 

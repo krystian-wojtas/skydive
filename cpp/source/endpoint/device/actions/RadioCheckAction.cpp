@@ -2,7 +2,7 @@
 
 #include "AppAction.hpp"
 
-#include "UserUavEvent.hpp"
+#include "OperatorEvent.hpp"
 
 RadioCheckAction::RadioCheckAction(Listener* const _listener):
     ICommAction(_listener)

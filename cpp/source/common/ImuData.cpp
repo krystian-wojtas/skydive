@@ -6,7 +6,7 @@
 
 #include <iomanip>
 
-#include "Exception.hpp"
+#include "SkyException.hpp"
 
 #endif //__SKYDIVE_USE_STL__
 
