@@ -170,7 +170,7 @@ std::string IMessage::toString(const MessageType type)
     case CONTROL_SETTINGS: return "CONTROL_SETTINGS";
     case ROUTE_CONTAINER: return "ROUTE_CONTAINER";
     case WIFI_CONFIGURATION: return "WIFI_CONFIGURATION";
-    default: __RL_EXCEPTION__("IMessage::toString::Unexpected message type");
+    default: __SKY_EXCEPTION__("IMessage::toString::Unexpected message type");
     }
 }
 

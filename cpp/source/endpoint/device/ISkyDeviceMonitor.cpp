@@ -4,9 +4,9 @@ ISkyDeviceMonitor::~ISkyDeviceMonitor()
 {
 }
 
-void ISkyDeviceMonitor::notifyUavEvent(const UavEvent* const event)
+void ISkyDeviceMonitor::notifyDeviceEvent(const DeviceEvent* const event)
 {
-    notifyUavEvent(std::unique_ptr<const UavEvent>(event));
+    notifyDeviceEvent(std::unique_ptr<const DeviceEvent>(event));
 }
 
 double ISkyDeviceMonitor::getControlDataSendingFreq(void)

@@ -4,11 +4,11 @@
 #ifndef RESETACTION_HPP
 #define RESETACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class ResetAction : public ICommAction
+class ResetAction : public ISkyDeviceAction
 {
 public:
     ResetAction(Listener* const _listener);

@@ -4,15 +4,15 @@
 #ifndef APPACTION_HPP
 #define APPACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
 class UserUavEventAction;
-class UserUavEventUpload;
-class UserUavEventDownload;
+class OperatorEventUpload;
+class OperatorEventDownload;
 
-class AppAction : public ICommAction
+class AppAction : public ISkyDeviceAction
 {
 public:
     AppAction(Listener* const _listener);
@@ -37,11 +37,11 @@ private:
     std::atomic<State> state;
 
     void handleReception(const IMessage& message) override;
-    void handleUserEvent(const UserUavEvent& event) override;
+    void handleUserEvent(const OperatorEvent& event) override;
 
     void handleUserUavEventAction(const UserUavEventAction& event);
-    void handleUserUavEventUpload(const UserUavEventUpload& event);
-    void handleUserUavEventDownload(const UserUavEventDownload& event);
+    void handleUserUavEventUpload(const OperatorEventUpload& event);
+    void handleUserUavEventDownload(const OperatorEventDownload& event);
 };
 
 #endif // APPACTION_HPP

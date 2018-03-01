@@ -3,21 +3,21 @@
 // ================================
 #include "OperatorEvent.hpp"
 
-UserUavEvent::UserUavEvent(const Type& _type) :
+OperatorEvent::OperatorEvent(const Type& _type) :
     type(_type)
 {
 }
 
-UserUavEvent::~UserUavEvent(void)
+OperatorEvent::~OperatorEvent(void)
 {
 }
 
-UserUavEvent::Type UserUavEvent::getType(void) const
+OperatorEvent::Type OperatorEvent::getType(void) const
 {
     return type;
 }
 
-std::string UserUavEvent::toString(void) const
+std::string OperatorEvent::toString(void) const
 {
     switch (type)
     {
@@ -39,72 +39,72 @@ std::string UserUavEvent::toString(void) const
     case RADIO_CALIBRATION_DONE: return "RADIO_CALIBRATION_DONE";
     case RADIO_CALIBRATION_SKIP: return "RADIO_CHECK_DONE";
     default:
-        __RL_EXCEPTION__("UserUavEvent::toString:Unexpected event type");
+        __SKY_EXCEPTION__("UserUavEvent::toString:Unexpected event type");
     }
 }
 
-UserUavEventConnect::UserUavEventConnect(ICommAction::Type _connectionType, ISkyCommInterface* _interface) :
-    UserUavEvent(CONNECT),
+OperatorEventConnect::OperatorEventConnect(ISkyDeviceAction::Type _connectionType, ISkyCommInterface* _interface) :
+    OperatorEvent(CONNECT),
     connetionType(_connectionType),
     interface(_interface)
 {
 }
 
-ICommAction::Type UserUavEventConnect::getConnectionType(void) const
+ISkyDeviceAction::Type OperatorEventConnect::getConnectionType(void) const
 {
     return connetionType;
 }
 
-ISkyCommInterface* UserUavEventConnect::getCommInnterface(void) const
+ISkyCommInterface* OperatorEventConnect::getCommInnterface(void) const
 {
     return interface;
 }
 
-UserUavEventAction::UserUavEventAction(ICommAction::Type _action) :
-    UserUavEvent(ACTION),
+UserUavEventAction::UserUavEventAction(ISkyDeviceAction::Type _action) :
+    OperatorEvent(ACTION),
     action(_action)
 {
 }
 
-ICommAction::Type UserUavEventAction::getAction(void) const
+ISkyDeviceAction::Type UserUavEventAction::getAction(void) const
 {
     return action;
 }
 
-UserUavEventUpload::UserUavEventUpload(const ISignalPayloadMessage& _data) :
-    UserUavEvent(UPLOAD),
+OperatorEventUpload::OperatorEventUpload(const ISignalPayloadMessage& _data) :
+    OperatorEvent(UPLOAD),
     data(_data)
 {
 }
 
-UserUavEventUpload::~UserUavEventUpload(void)
+OperatorEventUpload::~OperatorEventUpload(void)
 {
     delete &data;
 }
 
-const ISignalPayloadMessage& UserUavEventUpload::getData(void) const
+const ISignalPayloadMessage& OperatorEventUpload::getData(void) const
 {
     return data;
 }
 
-UserUavEventDownload::UserUavEventDownload(SignalData::Command _dataType) :
-    UserUavEvent(DOWNLOAD),
+OperatorEventDownload::OperatorEventDownload(SignalData::Command _dataType) :
+    OperatorEvent(DOWNLOAD),
     dataType(_dataType)
 {
 }
 
-SignalData::Command UserUavEventDownload::getDataType(void) const
+SignalData::Command OperatorEventDownload::getDataType(void) const
 {
     return dataType;
 }
 
-UserUavEventAutopilot::UserUavEventAutopilot(const Vect2Dd& _position):
-    UserUavEvent(AUTOPILOT),
+OperatorEventAutopilot::OperatorEventAutopilot(const Vect2Dd& _position):
+    OperatorEvent(AUTOPILOT),
     position(_position)
 {
 }
 
-const Vect2Dd& UserUavEventAutopilot::getPosition(void) const
+const Vect2Dd& OperatorEventAutopilot::getPosition(void) const
 {
     return position;
 }

@@ -4,11 +4,11 @@
 #ifndef UPLOADSIGNALPAYLOAD_HPP
 #define UPLOADSIGNALPAYLOAD_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class UploadSignalPayload : public ICommAction
+class UploadSignalPayload : public ISkyDeviceAction
 {
 public:
     UploadSignalPayload(Listener* const _listener, const ISignalPayloadMessage& _data);

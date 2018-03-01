@@ -4,11 +4,11 @@
 #ifndef ACCELCALIBACTION_HPP
 #define ACCELCALIBACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class AccelCalibAction : public ICommAction
+class AccelCalibAction : public ISkyDeviceAction
 {
 public:
     AccelCalibAction(Listener* const _listener);

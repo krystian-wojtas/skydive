@@ -4,13 +4,13 @@
 #ifndef CONNECTACTION_HPP
 #define CONNECTACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include "ISkyCommInterface.hpp"
 
 #include <atomic>
 
-class ConnectAction : public ICommAction
+class ConnectAction : public ISkyDeviceAction
 {
 public:
     ConnectAction(Listener* const _listener);

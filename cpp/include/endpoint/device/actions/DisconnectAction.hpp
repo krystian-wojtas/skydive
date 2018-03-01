@@ -4,11 +4,11 @@
 #ifndef DISCONNECTACTION_HPP
 #define DISCONNECTACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class DisconnectAction : public ICommAction
+class DisconnectAction : public ISkyDeviceAction
 {
 public:
     DisconnectAction(Listener* const _listener);

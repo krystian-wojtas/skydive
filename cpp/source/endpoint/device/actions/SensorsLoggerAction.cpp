@@ -5,7 +5,7 @@
 #include "OperatorEvent.hpp"
 
 SensorsLoggerAction::SensorsLoggerAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
     state = IDLE;
 }
@@ -28,7 +28,7 @@ IMessage::MessageType SensorsLoggerAction::getExpectedControlMessageType(void) c
     return IMessage::SENSORS_DATA;
 }
 
-ICommAction::Type SensorsLoggerAction::getType(void) const
+ISkyDeviceAction::Type SensorsLoggerAction::getType(void) const
 {
     return SENSORS_LOGGER;
 }
@@ -42,7 +42,7 @@ std::string SensorsLoggerAction::getStateName(void) const
     case LOGGING: return "LOGGING";
     case BREAKING: return "BREAKING";
     default:
-        __RL_EXCEPTION__("SensorsLoggerAction::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("SensorsLoggerAction::getStateName::Unexpected state");
     }
 }
 
@@ -59,7 +59,7 @@ void SensorsLoggerAction::handleReception(const IMessage& message)
     case LOGGING:
         if (IMessage::SENSORS_DATA == message.getMessageType())
         {
-            monitor->notifyUavEvent(new UavEventReceived(message));
+            monitor->notifyDeviceEvent(new UavEventReceived(message));
         }
         else
         {
@@ -81,7 +81,7 @@ void SensorsLoggerAction::handleSignalReception(const Parameter parameter)
         {
         case SignalData::ACK:
             state = LOGGING;
-            monitor->notifyUavEvent(new UavEvent(UavEvent::SENSORS_LOGGER_STARTED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::SENSORS_LOGGER_STARTED));
             break;
 
         default:
@@ -95,7 +95,7 @@ void SensorsLoggerAction::handleSignalReception(const Parameter parameter)
         case SignalData::BREAK_ACK:
             state = IDLE;
             listener->startAction(new AppAction(listener));
-            monitor->notifyUavEvent(new UavEvent(UavEvent::SENSORS_LOGGER_ENDED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::SENSORS_LOGGER_ENDED));
             break;
 
         default:
@@ -108,9 +108,9 @@ void SensorsLoggerAction::handleSignalReception(const Parameter parameter)
     }
 }
 
-void SensorsLoggerAction::handleUserEvent(const UserUavEvent& event)
+void SensorsLoggerAction::handleUserEvent(const OperatorEvent& event)
 {
-    if (LOGGING == state && UserUavEvent::BREAK_SENSORS_LOGGER == event.getType())
+    if (LOGGING == state && OperatorEvent::BREAK_SENSORS_LOGGER == event.getType())
     {
         state = BREAKING;
         listener->enableConnectionTimeoutTask(false);

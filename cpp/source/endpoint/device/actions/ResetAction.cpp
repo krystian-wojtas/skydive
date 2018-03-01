@@ -3,7 +3,7 @@
 #include "IdleAction.hpp"
 
 ResetAction::ResetAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
     state = IDLE;
 }
@@ -20,7 +20,7 @@ bool ResetAction::isActionDone(void) const
     return IDLE == state;
 }
 
-ICommAction::Type ResetAction::getType(void) const
+ISkyDeviceAction::Type ResetAction::getType(void) const
 {
     return RESET;
 }
@@ -32,7 +32,7 @@ std::string ResetAction::getStateName(void) const
     case IDLE: return "IDLE";
     case INITIAL_COMMAND: return "INITIAL_COMMAND";
     default:
-        __RL_EXCEPTION__("ResetAction::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("ResetAction::get__SKY_EXCEPTION__ected state");
     }
 }
 
@@ -53,7 +53,7 @@ void ResetAction::handleSignalReception(const Parameter parameter)
             state = IDLE;
             listener->startAction(new IdleAction(listener));
             listener->disconnectInterface();
-            monitor->notifyUavEvent(new UavEvent(UavEvent::APPLICATION_LOOP_TERMINATED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::APPLICATION_LOOP_TERMINATED));
             break;
 
         default:

@@ -4,11 +4,11 @@
 #ifndef SENSORSLOGGERACTION_HPP
 #define SENSORSLOGGERACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class SensorsLoggerAction : public ICommAction
+class SensorsLoggerAction : public ISkyDeviceAction
 {
 public:
     SensorsLoggerAction(Listener* const _listener);
@@ -36,7 +36,7 @@ private:
 
     void handleReception(const IMessage& message) override;
     void handleSignalReception(const Parameter parameter) override;
-    void handleUserEvent(const UserUavEvent& event) override;
+    void handleUserEvent(const OperatorEvent& event) override;
 };
 
 #endif // SENSORSLOGGERACTION_HPP

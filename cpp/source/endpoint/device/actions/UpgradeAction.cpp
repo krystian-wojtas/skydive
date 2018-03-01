@@ -4,7 +4,7 @@
 #include "AppAction.hpp"
 
 UpgradeAction::UpgradeAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
     state = IDLE;
 }
@@ -21,7 +21,7 @@ bool UpgradeAction::isActionDone(void) const
     return IDLE == state;
 }
 
-ICommAction::Type UpgradeAction::getType(void) const
+ISkyDeviceAction::Type UpgradeAction::getType(void) const
 {
     return UPGRADE;
 }
@@ -33,7 +33,7 @@ std::string UpgradeAction::getStateName(void) const
     case IDLE: return "IDLE";
     case INITIAL_COMMAND: return "INITIAL_COMMAND";
     default:
-        __RL_EXCEPTION__("UpgradeAction::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("UpgradeAction::ge__SKY_EXCEPTION__pected state");
     }
 }
 
@@ -52,15 +52,15 @@ void UpgradeAction::handleSignalReception(const Parameter parameter)
         case SignalData::ACK:
             state = IDLE;
             listener->startAction(new IdleAction(listener));
-            monitor->notifyUavEvent(new UavEvent(UavEvent::UPGRADE_STARTED));
-            monitor->notifyUavEvent(new UavEvent(UavEvent::APPLICATION_LOOP_TERMINATED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::UPGRADE_STARTED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::APPLICATION_LOOP_TERMINATED));
             listener->disconnectInterface();
             break;
 
         case SignalData::NOT_ALLOWED:
             state = IDLE;
             listener->startAction(new AppAction(listener));
-            monitor->notifyUavEvent(new UavEventMessage(UavEventMessage::WARNING,
+            monitor->notifyDeviceEvent(new UavEventMessage(UavEventMessage::WARNING,
                                                         "Board refused upgrade command, can not"
                                                         " be done over wireless interface."));
             break;

@@ -1,33 +1,33 @@
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include "OperatorEvent.hpp"
 #include "SKyException.hpp"
 
 #include <memory>
 
-ICommAction::Listener::~Listener(void)
+ISkyDeviceAction::Listener::~Listener(void)
 {
 }
 
-ICommAction::ICommAction(Listener* const _listener):
+ISkyDeviceAction::ISkyDeviceAction(Listener* const _listener):
     listener(_listener),
     monitor(listener->getMonitor())
 {
     wasSignalReceptionProcedure = false;
-    signalTimer = monitor->createTimer(std::bind(&ICommAction::baseHandleTimeout, this));
+    signalTimer = monitor->createTimer(std::bind(&ISkyDeviceAction::baseHandleTimeout, this));
 }
 
-ICommAction::~ICommAction()
+ISkyDeviceAction::~ISkyDeviceAction()
 {
     delete signalTimer;
 }
 
-void ICommAction::end(void)
+void ISkyDeviceAction::end(void)
 {
     // nothing to do in generic action end
 }
 
-void ICommAction::baseHandleReception(std::unique_ptr<const IMessage> message)
+void ISkyDeviceAction::baseHandleReception(std::unique_ptr<const IMessage> message)
 {
     // filter any SignalData to propper reception handler
     if (IMessage::SIGNAL_DATA == message->getMessageType())
@@ -43,22 +43,22 @@ void ICommAction::baseHandleReception(std::unique_ptr<const IMessage> message)
     }
 }
 
-void ICommAction::handleUserEvent(const UserUavEvent& event)
+void ISkyDeviceAction::handleUserEvent(const OperatorEvent& event)
 {
     except("Unexpected user uav event received", event);
 }
 
-IMessage::MessageType ICommAction::getExpectedControlMessageType(void) const
+IMessage::MessageType ISkyDeviceAction::getExpectedControlMessageType(void) const
 {
     return IMessage::DEBUG_DATA;
 }
 
-std::string ICommAction::getName(void) const
+std::string ISkyDeviceAction::getName(void) const
 {
     return toString(getType()) + " @ " + getStateName();
 }
 
-std::string ICommAction::toString(const Type type)
+std::string ISkyDeviceAction::toString(const Type type)
 {
     switch (type)
     {
@@ -79,11 +79,11 @@ std::string ICommAction::toString(const Type type)
     case RADIO_CALIB: return "RADIO_CALIB";
     case ESC_CALIB: return "ESC_CALIB";
     case RESET: return "RESET";
-    default: __RL_EXCEPTION__("ICommAction::toString::Unexpected action type");
+    default: __SKY_EXCEPTION__("ICommAction::toString::Unexpected action type");
     }
 }
 
-void ICommAction::handleReception(const SignalData& message)
+void ISkyDeviceAction::handleReception(const SignalData& message)
 {
     if (wasSignalReceptionProcedure)
     {
@@ -102,12 +102,12 @@ void ICommAction::handleReception(const SignalData& message)
     }
 }
 
-void ICommAction::handleSignalReception(const Parameter parameter)
+void ISkyDeviceAction::handleSignalReception(const Parameter parameter)
 {
     except("Unexpected handleSignalReception event ocured", parameter);
 }
 
-void ICommAction::baseHandleTimeout(void)
+void ISkyDeviceAction::baseHandleTimeout(void)
 {
     signalTimer->stop();
     if (wasSignalReceptionProcedure)
@@ -137,19 +137,19 @@ void ICommAction::baseHandleTimeout(void)
     }
 }
 
-void ICommAction::handleTimeout(void)
+void ISkyDeviceAction::handleTimeout(void)
 {
     except("Unexpected timeout event occurred");
 }
 
-void ICommAction::sendSignal(const Command command, const Parameter parameter, const unsigned timeout)
+void ISkyDeviceAction::sendSignal(const Command command, const Parameter parameter, const unsigned timeout)
 {
     sentSignal = SignalData(command, parameter);
     startSignalTimeout(command, timeout);
     listener->send(sentSignal);
 }
 
-void ICommAction::startSignalTimeout(const Command expectedCommand, const unsigned timeout)
+void ISkyDeviceAction::startSignalTimeout(const Command expectedCommand, const unsigned timeout)
 {
     monitor->trace("Starting signal reception " + SignalData::toString(expectedCommand) +
                    " with timeout: " + std::to_string(timeout) + " ms");
@@ -158,12 +158,12 @@ void ICommAction::startSignalTimeout(const Command expectedCommand, const unsign
     startSignalTimeoutTimer(timeout);
 }
 
-void ICommAction::startSignalTimeoutTimer(const unsigned timeout)
+void ISkyDeviceAction::startSignalTimeoutTimer(const unsigned timeout)
 {
     signalTimer->start(1000.0 / timeout);
 }
 
-void ICommAction::endSignalTimeout(void)
+void ISkyDeviceAction::endSignalTimeout(void)
 {
     signalTimer->stop();
     wasSignalReceptionProcedure = false;
@@ -172,7 +172,7 @@ void ICommAction::endSignalTimeout(void)
     sentSignal = SignalData(SignalData::DUMMY, SignalData::DUMMY_PARAMETER);
 }
 
-void ICommAction::initializeSignalPayloadReception(const SignalData::Command& command)
+void ISkyDeviceAction::initializeSignalPayloadReception(const SignalData::Command& command)
 {
     monitor->trace("ICommAction::initializeSignalPayloadReception: " + SignalData::toString(command));
     receivedSignalPayload = command;
@@ -181,7 +181,7 @@ void ICommAction::initializeSignalPayloadReception(const SignalData::Command& co
     signalTimer->start(1000.0 / (1.5 * DEFAULT_SIGNAL_TIMEOUT));
 }
 
-bool ICommAction::handleSignalPayloadReception(const IMessage& message)
+bool ISkyDeviceAction::handleSignalPayloadReception(const IMessage& message)
 {
     if (message.isSignalPayloadMessage())
     {
@@ -219,7 +219,7 @@ bool ICommAction::handleSignalPayloadReception(const IMessage& message)
     return false;
 }
 
-void ICommAction::handleIdleReception(const IMessage& message) const
+void ISkyDeviceAction::handleIdleReception(const IMessage& message) const
 {
     if (!(getExpectedControlMessageType() == message.getMessageType() || isPingMessage(message)))
     {
@@ -227,7 +227,7 @@ void ICommAction::handleIdleReception(const IMessage& message) const
     }
 }
 
-bool ICommAction::isPingMessage(const IMessage& received, int& value) const
+bool ISkyDeviceAction::isPingMessage(const IMessage& received, int& value) const
 {
     if (IMessage::SIGNAL_DATA == received.getMessageType()
             && SignalData::PING_VALUE == reinterpret_cast<const SignalData&>(received).getCommand())
@@ -241,45 +241,45 @@ bool ICommAction::isPingMessage(const IMessage& received, int& value) const
     }
 }
 
-bool ICommAction::isPingMessage(const IMessage& received) const
+bool ISkyDeviceAction::isPingMessage(const IMessage& received) const
 {
     int dummyValue;
     return isPingMessage(received, dummyValue);
 }
 
-bool ICommAction::matchSignalData(const SignalData& expected, const IMessage& received) const
+bool ISkyDeviceAction::matchSignalData(const SignalData& expected, const IMessage& received) const
 {
     return IMessage::SIGNAL_DATA == received.getMessageType()
             && expected == reinterpret_cast<const SignalData&>(received);
 }
 
-bool ICommAction::matchSignalData(const SignalData::Command command,
+bool ISkyDeviceAction::matchSignalData(const SignalData::Command command,
                                   const SignalData::Parameter parameter,
                                   const IMessage& received) const
 {
     return matchSignalData(SignalData(command, parameter), received);
 }
 
-void ICommAction::except(const std::string& message) const
+void ISkyDeviceAction::except(const std::string& message) const
 {
     std::string msg = message + " at " + getName();
-    __RL_EXCEPTION__(msg.c_str());
+    __SKY_EXCEPTION__(msg.c_str());
 }
 
-void ICommAction::except(const std::string& message, const IMessage& received) const
+void ISkyDeviceAction::except(const std::string& message, const IMessage& received) const
 {
     std::string msg = message + " at " + getName() + " message: " + received.toString();
-    __RL_EXCEPTION__(msg.c_str());
+    __SKY_EXCEPTION__(msg.c_str());
 }
 
-void ICommAction::except(const std::string& message, const UserUavEvent& event) const
+void ISkyDeviceAction::except(const std::string& message, const OperatorEvent& event) const
 {
     std::string msg = message + " at " + getName() + " event: " + event.toString();
-    __RL_EXCEPTION__(msg.c_str());
+    __SKY_EXCEPTION__(msg.c_str());
 }
 
-void ICommAction::except(const std::string& message, const SignalData::Parameter parameter) const
+void ISkyDeviceAction::except(const std::string& message, const SignalData::Parameter parameter) const
 {
     std::string msg = message + " at " + getName() + " parameter: " + SignalData::toString(parameter);
-    __RL_EXCEPTION__(msg.c_str());
+    __SKY_EXCEPTION__(msg.c_str());
 }

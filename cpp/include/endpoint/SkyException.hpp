@@ -1,22 +1,22 @@
 // =========== roboLib ============
 // ===  *** BARTOSZ NAWROT ***  ===
 // ================================
-#ifndef __EXCEPTION_GUARD__
-#define __EXCEPTION_GUARD__
+#ifndef __SKY_EXCEPTION_GUARD__
+#define __SKY_EXCEPTION_GUARD__
 
 #include <exception>
 #include <vector>
 #include <iostream>
 #include <string>
 
-#define __RL_EXCEPTION__( _WHAT ) (throw Exception( _WHAT, __TIME__, __FILE__, __LINE__))
+#define __SKY_EXCEPTION__( _WHAT ) (throw SkyException( _WHAT, __TIME__, __FILE__, __LINE__))
 
 /**
  * =============================================================================================
  * Exception
  * =============================================================================================
  */
-class Exception : public std::exception
+class SkyException : public std::exception
 {
 protected:
     std::string whatMessage;
@@ -24,11 +24,11 @@ protected:
     static std::vector<std::string> trace;
 
 	// dummy constructor for another types of exceptions
-    Exception(void);
+    SkyException(void);
 
 public:
-    Exception(const char* what, const char* time, const char* file, const int line);
-    virtual ~Exception();
+    SkyException(const char* what, const char* time, const char* file, const int line);
+    virtual ~SkyException();
 
 #ifdef __GNUC__
     virtual const char* what() const noexcept override;
@@ -42,4 +42,4 @@ public:
     static void printTrace(void);
 };
 
-#endif // __EXCEPTION_GUARD__
+#endif // __SKY_EXCEPTION_GUARD__

@@ -1,15 +1,15 @@
 #include "ISkyTimer.hpp"
 
-IAppTimer::IAppTimer(std::function<void (void)> _exec):
+ISkyTimer::ISkyTimer(std::function<void (void)> _exec):
     exec(_exec)
 {
 }
 
-IAppTimer::~IAppTimer(void)
+ISkyTimer::~ISkyTimer(void)
 {
 }
 
-void IAppTimer::onTimeout(void) const
+void ISkyTimer::onTimeout(void) const
 {
     exec();
 }

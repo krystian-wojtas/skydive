@@ -21,7 +21,7 @@
 #include <functional>
 
 AppAction::AppAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
     state = IDLE;
 }
@@ -44,7 +44,7 @@ bool AppAction::isActionDone(void) const
     return state == IDLE || state == APP_LOOP;
 }
 
-ICommAction::Type AppAction::getType(void) const
+ISkyDeviceAction::Type AppAction::getType(void) const
 {
     return APP;
 }
@@ -56,7 +56,7 @@ std::string AppAction::getStateName(void) const
     case IDLE: return "IDLE";
     case APP_LOOP: return "APP_LOOP";
     default:
-        __RL_EXCEPTION__("AppAction::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("AppAction::getStateName::Unexpected state");
     }
 }
 
@@ -67,7 +67,7 @@ void AppAction::handleReception(const IMessage& message)
     case APP_LOOP:
         if (IMessage::DEBUG_DATA == message.getMessageType())
         {
-            monitor->notifyUavEvent(new UavEventReceived(message));
+            monitor->notifyDeviceEvent(new UavEventReceived(message));
         }
         else if (isPingMessage(message))
         {
@@ -84,20 +84,20 @@ void AppAction::handleReception(const IMessage& message)
     }
 }
 
-void AppAction::handleUserEvent(const UserUavEvent& event)
+void AppAction::handleUserEvent(const OperatorEvent& event)
 {
     switch (event.getType())
     {
-    case UserUavEvent::ACTION:
+    case OperatorEvent::ACTION:
         handleUserUavEventAction(reinterpret_cast<const UserUavEventAction&>(event));
         break;
 
-    case UserUavEvent::UPLOAD:
-        handleUserUavEventUpload(reinterpret_cast<const UserUavEventUpload&>(event));
+    case OperatorEvent::UPLOAD:
+        handleUserUavEventUpload(reinterpret_cast<const OperatorEventUpload&>(event));
         break;
 
-    case UserUavEvent::DOWNLOAD:
-        handleUserUavEventDownload(reinterpret_cast<const UserUavEventDownload&>(event));
+    case OperatorEvent::DOWNLOAD:
+        handleUserUavEventDownload(reinterpret_cast<const OperatorEventDownload&>(event));
         break;
 
     default:
@@ -154,12 +154,12 @@ void AppAction::handleUserUavEventAction(const UserUavEventAction& event)
     }
 }
 
-void AppAction::handleUserUavEventUpload(const UserUavEventUpload& event)
+void AppAction::handleUserUavEventUpload(const OperatorEventUpload& event)
 {
     listener->startAction(new UploadSignalPayload(listener, *event.getData().clone()));
 }
 
-void AppAction::handleUserUavEventDownload(const UserUavEventDownload& event)
+void AppAction::handleUserUavEventDownload(const OperatorEventDownload& event)
 {
     listener->startAction(new DownloadSignalPaylod(listener, event.getDataType()));
 }

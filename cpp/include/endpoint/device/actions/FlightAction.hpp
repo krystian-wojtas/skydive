@@ -4,15 +4,15 @@
 #ifndef FLIGHTACTION_HPP
 #define FLIGHTACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include "AutopilotData.hpp"
 
 #include <atomic>
 
-class UserUavEventAutopilot;
+class OperatorEventAutopilot;
 
-class FlightAction : public ICommAction
+class FlightAction : public ISkyDeviceAction
 {
 public:
     FlightAction(Listener* const _listener, const double _controlFreq);
@@ -38,10 +38,10 @@ private:
 
     std::atomic<State> state;
 
-    IAppTimer* controlTimer;
+    ISkyTimer* controlTimer;
 
     void handleReception(const IMessage& message) override;
-    void handleUserEvent(const UserUavEvent& event) override;
+    void handleUserEvent(const OperatorEvent& event) override;
 
     void handleRunningReception(const IMessage& message);
     void handleAutopilotReception(const AutopilotData& message);
@@ -50,7 +50,7 @@ private:
 
     void flightEnded(const bool byBoard);
 
-    void sendAutopilotTarget(const UserUavEventAutopilot& event);
+    void sendAutopilotTarget(const OperatorEventAutopilot& event);
     void sendBaseConfirmation(const AutopilotData& base);
 };
 

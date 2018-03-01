@@ -166,7 +166,7 @@ ControlData::ControllerCommand ControlData::getCommandFromString(const std::stri
     }
     else
     {
-        __RL_EXCEPTION__("Unexpected command string");
+        __SKY_EXCEPTION__("Unexpected command string");
     }
 }
 
@@ -207,7 +207,7 @@ ControlData::SolverMode ControlData::getSolverModeFromString(const std::string& 
     }
     else
     {
-        __RL_EXCEPTION__("Unexpected command string");
+        __SKY_EXCEPTION__("Unexpected command string");
     }
 }
 
@@ -225,7 +225,7 @@ ControlData ControlData::parseFromString(const std::string& line)
           >> solverMode
           ))
     {
-        __RL_EXCEPTION__("Error while parsing data.");
+        __SKY_EXCEPTION__("Error while parsing data.");
     }
     controlData.solverMode = (unsigned char)solverMode;
     return controlData;

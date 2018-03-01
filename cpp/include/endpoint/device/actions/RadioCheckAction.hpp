@@ -4,11 +4,11 @@
 #ifndef RADIOCHECKACTION_HPP
 #define RADIOCHECKACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class RadioCheckAction : public ICommAction
+class RadioCheckAction : public ISkyDeviceAction
 {
 public:
     RadioCheckAction(Listener* const _listener);
@@ -37,7 +37,7 @@ private:
 
     void handleReception(const IMessage& message) override;
     void handleSignalReception(const Parameter parameter) override;
-    void handleUserEvent(const UserUavEvent& event) override;
+    void handleUserEvent(const OperatorEvent& event) override;
 };
 
 #endif // RADIOCHECKACTION_HPP

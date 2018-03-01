@@ -3,7 +3,7 @@
 #include "AppAction.hpp"
 
 DownloadSignalPaylod::DownloadSignalPaylod(Listener* const _listener, const SignalData::Command _type):
-    ICommAction(_listener),
+    ISkyDeviceAction(_listener),
     type(_type),
     downloadCommand(getDownloadCommand())
 {
@@ -22,7 +22,7 @@ bool DownloadSignalPaylod::isActionDone(void) const
     return IDLE == state;
 }
 
-ICommAction::Type DownloadSignalPaylod::getType(void) const
+ISkyDeviceAction::Type DownloadSignalPaylod::getType(void) const
 {
     return DOWNLOAD_SIGNAL_PAYLOAD;
 }
@@ -35,7 +35,7 @@ std::string DownloadSignalPaylod::getStateName(void) const
     case INITIAL_COMMAND: return "INITIAL_COMMAND";
     case DATA_RECEPTION: return "DATA_RECEPTION";
     default:
-        __RL_EXCEPTION__("DownloadSignalPaylod::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("DownloadSignalPaylo__SKY_EXCEPTION__:Unexpected state");
     }
 }
 
@@ -53,7 +53,7 @@ void DownloadSignalPaylod::handleReception(const IMessage& message)
         {
             state = IDLE;
             listener->startAction(new AppAction(listener));
-            monitor->notifyUavEvent(new UavEventReceived(message));
+            monitor->notifyDeviceEvent(new UavEventReceived(message));
         }
         break;
 
@@ -76,7 +76,7 @@ void DownloadSignalPaylod::handleSignalReception(const Parameter parameter)
             break;
 
         case SignalData::FAIL:
-            monitor->notifyUavEvent(new UavEvent(getMonitorFailEvent()));
+            monitor->notifyDeviceEvent(new DeviceEvent(getMonitorFailEvent()));
             state = IDLE;
             listener->startAction(new AppAction(listener));
             break;
@@ -98,17 +98,17 @@ SignalData::Command DownloadSignalPaylod::getDownloadCommand(void) const
     case SignalData::CONTROL_SETTINGS: return SignalData::DOWNLOAD_SETTINGS;
     case SignalData::ROUTE_CONTAINER: return SignalData::DOWNLOAD_ROUTE;
     default:
-        __RL_EXCEPTION__("DownloadSignalPaylod::getDownloadCommand::Unexpected type");
+        __SKY_EXCEPTION__("DownloadSignalPaylod::getDownloadCommand::Unexpected type");
     }
 }
 
-UavEvent::Type DownloadSignalPaylod::getMonitorFailEvent(void) const
+DeviceEvent::Type DownloadSignalPaylod::getMonitorFailEvent(void) const
 {
     switch (type)
     {
-    case SignalData::CONTROL_SETTINGS: return UavEvent::CONTROLS_DOWNLOAD_FAIL;
-    case SignalData::ROUTE_CONTAINER: return UavEvent::ROUTE_DOWNLOAD_FAIL;
+    case SignalData::CONTROL_SETTINGS: return DeviceEvent::CONTROLS_DOWNLOAD_FAIL;
+    case SignalData::ROUTE_CONTAINER: return DeviceEvent::ROUTE_DOWNLOAD_FAIL;
     default:
-        __RL_EXCEPTION__("DownloadSignalPaylod::getMonitorFailEvent::Unexpected type");
+        __SKY_EXCEPTION__("DownloadSignalPaylod::getMonitorFailEvent::Unexpected type");
     }
 }

@@ -7,7 +7,7 @@
 #include "CalibrationSettings.hpp"
 
 ConnectAction::ConnectAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
     state = IDLE;
     wasNonStatic = false;
@@ -25,7 +25,7 @@ bool ConnectAction::isActionDone(void) const
     return state == IDLE;
 }
 
-ICommAction::Type ConnectAction::getType(void) const
+ISkyDeviceAction::Type ConnectAction::getType(void) const
 {
     return CONNECT;
 }
@@ -40,7 +40,7 @@ std::string ConnectAction::getStateName(void) const
     case CALIBRATION_RECEPTION: return "CALIBRATION_RECEPTION";
     case FINAL_COMMAND: return "FINAL_COMMAND";
     default:
-        __RL_EXCEPTION__("ConnectAction::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("ConnectAction::getStateName::Unexpected state");
     }
 }
 
@@ -54,7 +54,7 @@ void ConnectAction::handleReception(const IMessage& message)
             state = FINAL_COMMAND;
             listener->send(SignalData(SignalData::APP_LOOP, SignalData::START));
             startSignalTimeout(SignalData::APP_LOOP);
-            monitor->notifyUavEvent(new UavEventReceived(message));
+            monitor->notifyDeviceEvent(new UavEventReceived(message));
         }
         break;
 
@@ -96,7 +96,7 @@ void ConnectAction::handleSignalReception(const Parameter parameter)
             if (!wasNonStatic)
             {
                 wasNonStatic = true;
-                monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATION_NON_STATIC));
+                monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATION_NON_STATIC));
             }
             break;
 
@@ -112,7 +112,7 @@ void ConnectAction::handleSignalReception(const Parameter parameter)
             monitor->trace("App loop ready");
             state = IDLE;
             listener->startAction(new AppAction(listener));
-            monitor->notifyUavEvent(new UavEvent(UavEvent::APPLICATION_LOOP_STARTED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::APPLICATION_LOOP_STARTED));
             break;
 
         default:

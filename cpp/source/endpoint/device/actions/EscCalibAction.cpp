@@ -5,7 +5,7 @@
 #include "OperatorEvent.hpp"
 
 EscCalibAction::EscCalibAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
     state = IDLE;
     breaking = false;
@@ -23,7 +23,7 @@ bool EscCalibAction::isActionDone(void) const
     return IDLE == state;
 }
 
-ICommAction::Type EscCalibAction::getType(void) const
+ISkyDeviceAction::Type EscCalibAction::getType(void) const
 {
     return ESC_CALIB;
 }
@@ -42,7 +42,7 @@ std::string EscCalibAction::getStateName(void) const
     case FINAL_ESC_DISCONNECT: return "FINAL_ESC_DISCONNECT";
     case FINAL_ESC_DISCONNECT_ACK: return "FINAL_ESC_DISCONNECT_ACK";
     default:
-        __RL_EXCEPTION__("EscCalib::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("EscCalib::getStateName::Unexpected state");
     }
 }
 
@@ -95,14 +95,14 @@ void EscCalibAction::handleSignalReception(const Parameter parameter)
             monitor->trace("ESC calibration procedure started");
             listener->enableConnectionTimeoutTask(false);
             state = ESC_DISCONNECT;
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_ESC_STARTED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_ESC_STARTED));
             break;
 
         case SignalData::NOT_ALLOWED:
             monitor->trace("ESC calibration not allowed");
             state = IDLE;
             listener->startAction(new AppAction(listener));
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_ESC_NOT_ALLOWED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_ESC_NOT_ALLOWED));
             break;
 
         default:
@@ -129,13 +129,13 @@ void EscCalibAction::handleSignalReception(const Parameter parameter)
             default:
                 except("Received unexpected ACK for calibration proceed");
             }
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_ESC_DONE));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_ESC_DONE));
             break;
 
         case SignalData::BREAK_ACK:
             if (breaking)
             {
-                monitor->notifyUavEvent(new UavEventMessage(UavEventMessage::INFO,
+                monitor->notifyDeviceEvent(new UavEventMessage(UavEventMessage::INFO,
                                                             "ESC calibration broken."));
                 state = IDLE;
                 listener->startAction(new AppAction(listener));
@@ -156,7 +156,7 @@ void EscCalibAction::handleSignalReception(const Parameter parameter)
         {
         case SignalData::DONE:
             state = FINAL_ESC_DISCONNECT;
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_ESC_DONE));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_ESC_DONE));
             break;
 
         default:
@@ -170,7 +170,7 @@ void EscCalibAction::handleSignalReception(const Parameter parameter)
         case SignalData::ACK:
             state = IDLE;
             listener->startAction(new AppAction(listener));
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_ESC_ENDED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_ESC_ENDED));
             break;
 
         default:
@@ -184,15 +184,15 @@ void EscCalibAction::handleSignalReception(const Parameter parameter)
 }
 
 
-void EscCalibAction::handleUserEvent(const UserUavEvent& event)
+void EscCalibAction::handleUserEvent(const OperatorEvent& event)
 {
     switch (event.getType())
     {
-    case UserUavEvent::ESC_CALIB_DONE:
+    case OperatorEvent::ESC_CALIB_DONE:
         proceed(Parameter::DONE);
         break;
 
-    case UserUavEvent::ESC_CALIB_ABORT:
+    case OperatorEvent::ESC_CALIB_ABORT:
         breaking = true;
         proceed(Parameter::BREAK_FAIL);
         break;

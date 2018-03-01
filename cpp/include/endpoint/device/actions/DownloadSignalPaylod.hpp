@@ -4,11 +4,11 @@
 #ifndef DOWNLOADSIGNALPAYLOD_HPP
 #define DOWNLOADSIGNALPAYLOD_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class DownloadSignalPaylod : public ICommAction
+class DownloadSignalPaylod : public ISkyDeviceAction
 {
 public:
     DownloadSignalPaylod(Listener* const _listener, const SignalData::Command _type);
@@ -38,7 +38,7 @@ private:
     void handleSignalReception(const Parameter parameter) override;
 
     SignalData::Command getDownloadCommand(void) const;
-    UavEvent::Type getMonitorFailEvent(void) const;
+    DeviceEvent::Type getMonitorFailEvent(void) const;
 };
 
 #endif // DOWNLOADSIGNALPAYLOD_HPP

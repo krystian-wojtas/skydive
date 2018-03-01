@@ -4,11 +4,11 @@
 #ifndef MAGNETCALIBACTION_HPP
 #define MAGNETCALIBACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class MagnetCalibAction : public ICommAction
+class MagnetCalibAction : public ISkyDeviceAction
 {
 public:
     MagnetCalibAction(Listener* const _listener);
@@ -36,7 +36,7 @@ private:
 
     void handleReception(const IMessage& message) override;
     void handleSignalReception(const Parameter parameter) override;
-    void handleUserEvent(const UserUavEvent& event) override;
+    void handleUserEvent(const OperatorEvent& event) override;
 };
 
 #endif // MAGNETCALIBACTION_HPP

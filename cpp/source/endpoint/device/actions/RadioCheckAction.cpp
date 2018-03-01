@@ -5,7 +5,7 @@
 #include "OperatorEvent.hpp"
 
 RadioCheckAction::RadioCheckAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
     state = IDLE;
 }
@@ -28,7 +28,7 @@ bool RadioCheckAction::isActionDone(void) const
     return IDLE == state;
 }
 
-ICommAction::Type RadioCheckAction::getType(void) const
+ISkyDeviceAction::Type RadioCheckAction::getType(void) const
 {
     return RADIO_CHECK;
 }
@@ -43,7 +43,7 @@ std::string RadioCheckAction::getStateName(void) const
     case RUNNING: return "RUNNING";
     case BREAKING: return "BREAKING";
     default:
-        __RL_EXCEPTION__("RadioCheckAction::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("RadioCheckAction::getStateName::Unexpected state");
     }
 }
 
@@ -60,8 +60,8 @@ void RadioCheckAction::handleReception(const IMessage& message)
         if (handleSignalPayloadReception(message))
         {
             monitor->trace("Check radio started");
-            monitor->notifyUavEvent(new UavEventReceived(message));
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CHECK_RADIO_STARTED));
+            monitor->notifyDeviceEvent(new UavEventReceived(message));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CHECK_RADIO_STARTED));
             state = RUNNING;
         }
         break;
@@ -70,7 +70,7 @@ void RadioCheckAction::handleReception(const IMessage& message)
     case RUNNING:
         if (IMessage::CONTROL_DATA == message.getMessageType())
         {
-            monitor->notifyUavEvent(new UavEventReceived(message));
+            monitor->notifyDeviceEvent(new UavEventReceived(message));
         }
         else
         {
@@ -99,7 +99,7 @@ void RadioCheckAction::handleSignalReception(const Parameter parameter)
 
         case SignalData::NOT_ALLOWED:
             monitor->trace("Check radio not allowed, breaking");
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CHECK_RADIO_NOT_ALLOWED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CHECK_RADIO_NOT_ALLOWED));
             state = IDLE;
             listener->startAction(new AppAction(listener));
             break;
@@ -114,7 +114,7 @@ void RadioCheckAction::handleSignalReception(const Parameter parameter)
         {
         case SignalData::BREAK_ACK:
             monitor->trace("Check radio done");
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CHECK_RADIO_ENDED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CHECK_RADIO_ENDED));
             state = IDLE;
             listener->startAction(new AppAction(listener));
             break;
@@ -129,13 +129,13 @@ void RadioCheckAction::handleSignalReception(const Parameter parameter)
     }
 }
 
-void RadioCheckAction::handleUserEvent(const UserUavEvent& event)
+void RadioCheckAction::handleUserEvent(const OperatorEvent& event)
 {
     if (RUNNING == state)
     {
         switch (event.getType())
         {
-        case UserUavEvent::RADIO_CHECK_DONE:
+        case OperatorEvent::RADIO_CHECK_DONE:
             state = BREAKING;
             listener->enableConnectionTimeoutTask(false);
             sendSignal(SignalData::CHECK_RADIO, SignalData::BREAK);

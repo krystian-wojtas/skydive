@@ -10,7 +10,7 @@
 #include "ISkyCommInterface.hpp"
 #include "ISkyDeviceMonitor.hpp"
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include "CommDispatcher.hpp"
 
@@ -20,7 +20,7 @@
 
 class SkyDevice :
         public ISkyCommInterface::Listener,
-        public ICommAction::Listener
+        public ISkyDeviceAction::Listener
 {
 public:
     SkyDevice(ISkyDeviceMonitor* const _monitor,
@@ -36,19 +36,19 @@ public:
      * Event should be dynamicaly allocated and will be deleted after processing.
      * Calling this method is thread safe.
      */
-    void pushUserUavEvent(const UserUavEvent* const userUavEvent);
+    void pushOperatorEvent(const OperatorEvent* const operatorEvent);
 
     /**
      * Memory safe implementation for raw pointer argument pushUserUavEvent method.
      */
-    void pushUserUavEvent(std::unique_ptr<const UserUavEvent> userUavEvent);
+    void pushOperatorEvent(std::unique_ptr<const OperatorEvent> operatorEvent);
 
     /**
      * Returns state of communication with UAV. Also this is state of UAV processing loop.
      * Evaluation of allowed UserUavEvent should be done by checking ongoing state.
      * Calling this method is thread safe.
      */
-    ICommAction::Type getState(void) const;
+    ISkyDeviceAction::Type getState(void) const;
 
 private:
     // listener for events emitted from UAV
@@ -58,7 +58,7 @@ private:
     ISkyCommInterface* interface;
 
     // preformed UAV action
-    std::shared_ptr<ICommAction> action;
+    std::shared_ptr<ISkyDeviceAction> action;
 
     // dispatcher for SkyDive Comm Protocol
     CommDispatcher dispatcher;
@@ -68,8 +68,8 @@ private:
     const double connectionTimeoutFreq;
 
     // timers for freqent tasks
-    std::unique_ptr<IAppTimer> pingTimer;
-    std::unique_ptr<IAppTimer> connetionTimer;
+    std::unique_ptr<ISkyTimer> pingTimer;
+    std::unique_ptr<ISkyTimer> connetionTimer;
 
     // ping feature variables
     int sentPingValue;
@@ -85,9 +85,9 @@ private:
 
     // notify methods, can be called from another thread so action
     // has to be locked under shared pointer
-    void notifyUserUavEvent(std::shared_ptr<ICommAction> actionLock,
-                            const UserUavEvent* const userUavEvent);
-    void notifyReception(std::shared_ptr<ICommAction> actionLock,
+    void notifyOperatorEvent(std::shared_ptr<ISkyDeviceAction> actionLock,
+                            const OperatorEvent* const operatorEvent);
+    void notifyReception(std::shared_ptr<ISkyDeviceAction> actionLock,
                          const IMessage* const message);
 
     void handleError(const std::string& message);
@@ -105,7 +105,7 @@ private:
 
     // ICommAction::Listener overrides
     ISkyDeviceMonitor* getMonitor(void) override;
-    void startAction(ICommAction* action, bool immediateStart = true) override;
+    void startAction(ISkyDeviceAction* action, bool immediateStart = true) override;
     void onPongReception(const SignalData& pong) override;
     void send(const IMessage& message) override;
     void send(const ISignalPayloadMessage& message) override;

@@ -3,7 +3,7 @@
 #include "AppAction.hpp"
 
 UploadSignalPayload::UploadSignalPayload(Listener* const _listener,  const ISignalPayloadMessage& _data):
-    ICommAction(_listener),
+    ISkyDeviceAction(_listener),
     data(_data),
     command(getUploadCommand(data.getMessageType()))
 {
@@ -23,7 +23,7 @@ bool UploadSignalPayload::isActionDone(void) const
     return IDLE == state;
 }
 
-ICommAction::Type UploadSignalPayload::getType(void) const
+ISkyDeviceAction::Type UploadSignalPayload::getType(void) const
 {
     return UPLOAD_SIGNAL_PAYLOAD;
 }
@@ -36,7 +36,7 @@ std::string UploadSignalPayload::getStateName(void) const
     case INITIAL_COMMAND: return "INITIAL_COMMAND";
     case UPLOAD: return "UPLOAD";
     default:
-        __RL_EXCEPTION__("UploadSignalPayload::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("UploadSignalPayload:__SKY_EXCEPTION__nexpected state");
     }
 }
 
@@ -77,7 +77,7 @@ void UploadSignalPayload::handleSignalReception(const Parameter parameter)
         {
         case SignalData::ACK:
             monitor->trace("Upload successfull");
-            monitor->notifyUavEvent(new UavEventSent(data));
+            monitor->notifyDeviceEvent(new UavEventSent(data));
             state = IDLE;
             listener->startAction(new AppAction(listener));
             break;
@@ -117,6 +117,6 @@ SignalData::Command UploadSignalPayload::getUploadCommand(const IMessage::Messag
     case IMessage::ROUTE_CONTAINER: return SignalData::UPLOAD_ROUTE;
     case IMessage::WIFI_CONFIGURATION: return SignalData::WIFI_CONFIGURATION;
     default:
-        __RL_EXCEPTION__("DownloadSignalPaylod::getDownloadCommand::Unexpected type");
+        __SKY_EXCEPTION__("DownloadSignalPaylod::getDownloadCommand::Unexpected type");
     }
 }

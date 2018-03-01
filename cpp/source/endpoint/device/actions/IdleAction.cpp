@@ -7,7 +7,7 @@
 #include "WhoAmIAction.hpp"
 
 IdleAction::IdleAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
 }
 
@@ -20,7 +20,7 @@ bool IdleAction::isActionDone(void) const
     return true;
 }
 
-ICommAction::Type IdleAction::getType(void) const
+ISkyDeviceAction::Type IdleAction::getType(void) const
 {
     return IDLE_ACTION;
 }
@@ -35,26 +35,26 @@ void IdleAction::handleReception(const IMessage& message)
     except("Unexpected message received", message);
 }
 
-void IdleAction::handleUserEvent(const UserUavEvent& event)
+void IdleAction::handleUserEvent(const OperatorEvent& event)
 {
     switch (event.getType())
     {
-    case UserUavEvent::CONNECT:
+    case OperatorEvent::CONNECT:
     {
-        const UserUavEventConnect& ev = reinterpret_cast<const UserUavEventConnect&>(event);
+        const OperatorEventConnect& ev = reinterpret_cast<const OperatorEventConnect&>(event);
         switch (ev.getConnectionType())
         {
-        case ICommAction::APP:
+        case ISkyDeviceAction::APP:
             listener->startAction(new ConnectAction(listener), false);
             listener->connectInterface(ev.getCommInnterface());
             break;
 
-        case ICommAction::UPGRADE:
+        case ISkyDeviceAction::UPGRADE:
             listener->startAction(new UpgradeAction(listener), false);
             listener->connectInterface(ev.getCommInnterface());
             break;
 
-        case ICommAction::WHO_AM_I:
+        case ISkyDeviceAction::WHO_AM_I:
             listener->startAction(new WhoAmIAction(listener), false);
             listener->connectInterface(ev.getCommInnterface());
             break;

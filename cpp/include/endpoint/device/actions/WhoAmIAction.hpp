@@ -4,11 +4,11 @@
 #ifndef WHOAMIACTION_HPP
 #define WHOAMIACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class WhoAmIAction : public ICommAction
+class WhoAmIAction : public ISkyDeviceAction
 {
 public:
     WhoAmIAction(Listener* const _listener);

@@ -6,7 +6,7 @@
 #include "SkyException.hpp"
 
 FlightInitializationAction::FlightInitializationAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
     state = IDLE;
 }
@@ -23,7 +23,7 @@ bool FlightInitializationAction::isActionDone(void) const
     return IDLE == state;
 }
 
-ICommAction::Type FlightInitializationAction::getType(void) const
+ISkyDeviceAction::Type FlightInitializationAction::getType(void) const
 {
     return FLIGHT_INITIALIZATION;
 }
@@ -38,7 +38,7 @@ std::string FlightInitializationAction::getStateName(void) const
     case ROUTE_COMMAND: return "ROUTE_COMMAND";
     case ROUTE_RECEPTION: return "ROUTE_RECEPTION";
     default:
-        __RL_EXCEPTION__("FlightAction::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("FlightAction::getStateName::Unexpected state");
     }
 }
 
@@ -54,7 +54,7 @@ void FlightInitializationAction::handleReception(const IMessage& message)
     case CONTROLS_RECEPTION:
         if (handleSignalPayloadReception(message))
         {
-            monitor->notifyUavEvent(new UavEventReceived(message));
+            monitor->notifyDeviceEvent(new UavEventReceived(message));
             startSignalTimeout(SignalData::FLIGHT_LOOP);
             state = ROUTE_COMMAND;
         }
@@ -63,7 +63,7 @@ void FlightInitializationAction::handleReception(const IMessage& message)
     case ROUTE_RECEPTION:
         if (handleSignalPayloadReception(message))
         {
-            monitor->notifyUavEvent(new UavEventReceived(message));
+            monitor->notifyDeviceEvent(new UavEventReceived(message));
             flightReady();
         }
         break;
@@ -87,7 +87,7 @@ void FlightInitializationAction::handleSignalReception(const Parameter parameter
             break;
 
         case SignalData::NOT_ALLOWED:
-            monitor->notifyUavEvent(new UavEvent(UavEvent::FLIGHT_LOOP_NOT_ALLOWED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::FLIGHT_LOOP_NOT_ALLOWED));
             state = IDLE;
             listener->startAction(new AppAction(listener));
             break;
@@ -107,7 +107,7 @@ void FlightInitializationAction::handleSignalReception(const Parameter parameter
             break;
 
         case SignalData::VIA_ROUTE_NOT_ALLOWED:
-            monitor->notifyUavEvent(new UavEvent(UavEvent::VIA_ROUTE_NOT_ALLOWED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::VIA_ROUTE_NOT_ALLOWED));
             flightReady();
             break;
 

@@ -4,20 +4,20 @@
 #include "ISignalPayloadMessage.hpp"
 
 #include "ISkyCommInterface.hpp"
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include "SkyException.hpp"
 
 #include <string>
 
-class ICommAction;
+class ISkyDeviceAction;
 
 /**
  * =============================================================================================
  * UserUavEvent
  * =============================================================================================
  */
-class UserUavEvent
+class OperatorEvent
 {
 public:
     enum Type
@@ -43,65 +43,65 @@ public:
 
     const Type type;
 
-    UserUavEvent(const Type& _type);
+    OperatorEvent(const Type& _type);
 
-    virtual ~UserUavEvent(void);
+    virtual ~OperatorEvent(void);
     Type getType(void) const;
 
     virtual std::string toString(void) const;
 };
 
-class UserUavEventConnect : public UserUavEvent
+class OperatorEventConnect : public OperatorEvent
 {
-    ICommAction::Type connetionType;
+    ISkyDeviceAction::Type connetionType;
     ISkyCommInterface* interface;
 
 public:
-    UserUavEventConnect(ICommAction::Type _connectionType, ISkyCommInterface* _interface);
+    OperatorEventConnect(ISkyDeviceAction::Type _connectionType, ISkyCommInterface* _interface);
 
-    ICommAction::Type getConnectionType(void) const;
+    ISkyDeviceAction::Type getConnectionType(void) const;
 
     ISkyCommInterface* getCommInnterface(void) const;
 };
 
-class UserUavEventAction : public UserUavEvent
+class UserUavEventAction : public OperatorEvent
 {
-    ICommAction::Type action;
+    ISkyDeviceAction::Type action;
 
 public:
-    UserUavEventAction(ICommAction::Type _action);
+    UserUavEventAction(ISkyDeviceAction::Type _action);
 
-    ICommAction::Type getAction(void) const;
+    ISkyDeviceAction::Type getAction(void) const;
 };
 
-class UserUavEventUpload : public UserUavEvent
+class OperatorEventUpload : public OperatorEvent
 {
     const ISignalPayloadMessage& data;
 
 public:
-    UserUavEventUpload(const ISignalPayloadMessage& _data);
+    OperatorEventUpload(const ISignalPayloadMessage& _data);
 
-    ~UserUavEventUpload(void);
+    ~OperatorEventUpload(void);
 
     const ISignalPayloadMessage& getData(void) const;
 };
 
-class UserUavEventDownload : public UserUavEvent
+class OperatorEventDownload : public OperatorEvent
 {
     SignalData::Command dataType;
 
 public:
-    UserUavEventDownload(SignalData::Command _dataType);
+    OperatorEventDownload(SignalData::Command _dataType);
 
     SignalData::Command getDataType(void) const;
 };
 
-class UserUavEventAutopilot : public UserUavEvent
+class OperatorEventAutopilot : public OperatorEvent
 {
     Vect2Dd position;
 
 public:
-    UserUavEventAutopilot(const Vect2Dd& _position);
+    OperatorEventAutopilot(const Vect2Dd& _position);
 
     const Vect2Dd& getPosition(void) const;
 };

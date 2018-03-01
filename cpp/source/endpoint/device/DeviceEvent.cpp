@@ -3,21 +3,21 @@
 // ================================
 #include "DeviceEvent.hpp"
 
-UavEvent::UavEvent(const Type& _type):
+DeviceEvent::DeviceEvent(const Type& _type):
     type(_type)
 {
 }
 
-UavEvent::~UavEvent(void)
+DeviceEvent::~DeviceEvent(void)
 {
 }
 
-UavEvent::Type UavEvent::getType(void) const
+DeviceEvent::Type DeviceEvent::getType(void) const
 {
     return type;
 }
 
-std::string UavEvent::toString(void) const
+std::string DeviceEvent::toString(void) const
 {
     switch (type)
     {
@@ -57,12 +57,12 @@ std::string UavEvent::toString(void) const
     case CALIBRATE_ESC_DONE: return "CALIBRATE_ESC_DONE";
     case CALIBRATE_ESC_ENDED: return "CALIBRATE_ESC_ENDED";
     default:
-        __RL_EXCEPTION__("UavEvent::toString:Unexpected event type");
+        __SKY_EXCEPTION__("UavEvent::toString:Unexpected event type");
     }
 }
 
 UavEventMessage::UavEventMessage(const MessageType& _messageType, const std::string& _message):
-    UavEvent(MESSAGE),
+    DeviceEvent(MESSAGE),
     messageType(_messageType),
     message(_message)
 {
@@ -85,11 +85,11 @@ std::string UavEventMessage::getMessage(void) const
 
 std::string UavEventMessage::toString(void) const
 {
-    return UavEvent::toString() + " with:\n\"" + message + "\"";
+    return DeviceEvent::toString() + " with:\n\"" + message + "\"";
 }
 
 UavEventReceived::UavEventReceived(const IMessage& _received) :
-    UavEvent(DATA_RECEIVED),
+    DeviceEvent(DATA_RECEIVED),
     received(_received)
 {
 }
@@ -106,11 +106,11 @@ const IMessage& UavEventReceived::getReceived(void) const
 
 std::string UavEventReceived::toString(void) const
 {
-    return UavEvent::toString() + " with: " + received.getMessageName();
+    return DeviceEvent::toString() + " with: " + received.getMessageName();
 }
 
 UavEventSent::UavEventSent(const IMessage& _sent) :
-    UavEvent(DATA_SENT),
+    DeviceEvent(DATA_SENT),
     sent(_sent)
 {
 }
@@ -127,13 +127,13 @@ const IMessage& UavEventSent::getSent(void) const
 
 std::string UavEventSent::toString(void) const
 {
-    return UavEvent::toString() + " with: " + sent.getMessageName();
+    return DeviceEvent::toString() + " with: " + sent.getMessageName();
 }
 
 UavEventConnectionStatus::UavEventConnectionStatus(const unsigned _ping,
                                                    const unsigned _received,
                                                    const unsigned _fails) :
-    UavEvent(CONNECTION_STATUS),
+    DeviceEvent(CONNECTION_STATUS),
     ping(_ping),
     received(_received),
     fails(_fails)
@@ -157,11 +157,11 @@ unsigned UavEventConnectionStatus::getFails(void) const
 
 std::string UavEventConnectionStatus::toString(void) const
 {
-    return UavEvent::toString() + ": " + std::to_string(ping) + " ms";
+    return DeviceEvent::toString() + ": " + std::to_string(ping) + " ms";
 }
 
 UavEventWhoAmI::UavEventWhoAmI(const CalibrationSettings::BoardType _type) :
-    UavEvent(WHO_AM_I),
+    DeviceEvent(WHO_AM_I),
     boardType(_type)
 {
 }
@@ -173,5 +173,5 @@ CalibrationSettings::BoardType UavEventWhoAmI::getBoardType(void) const
 
 std::string UavEventWhoAmI::toString(void) const
 {
-    return UavEvent::toString() + ": " + CalibrationSettings::getBoardTypeString(boardType);
+    return DeviceEvent::toString() + ": " + CalibrationSettings::getBoardTypeString(boardType);
 }

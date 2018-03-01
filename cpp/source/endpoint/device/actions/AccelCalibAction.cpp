@@ -3,7 +3,7 @@
 #include "AppAction.hpp"
 
 AccelCalibAction::AccelCalibAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
     state = IDLE;
 }
@@ -20,7 +20,7 @@ bool AccelCalibAction::isActionDone(void) const
     return IDLE == state;
 }
 
-ICommAction::Type AccelCalibAction::getType(void) const
+ISkyDeviceAction::Type AccelCalibAction::getType(void) const
 {
     return ACCEL_CALIB;
 }
@@ -34,7 +34,7 @@ std::string AccelCalibAction::getStateName(void) const
     case CALIBRATION: return "CALIBRATION";
     case CALIBRATION_RECEPTION: return "CALIBRATION_RECEPTION";
     default:
-        __RL_EXCEPTION__("AccelCalibAction::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("AccelCalibAction::__SKY_EXCEPTION__expected state");
     }
 }
 
@@ -50,7 +50,7 @@ void AccelCalibAction::handleReception(const IMessage& message)
     case CALIBRATION_RECEPTION:
         if (handleSignalPayloadReception(message))
         {
-            monitor->notifyUavEvent(new UavEventReceived(message));
+            monitor->notifyDeviceEvent(new UavEventReceived(message));
             state = IDLE;
             listener->startAction(new AppAction(listener));
         }
@@ -89,7 +89,7 @@ void AccelCalibAction::handleSignalReception(const Parameter parameter)
             break;
 
         case SignalData::NON_STATIC:
-            monitor->notifyUavEvent(new UavEventMessage(UavEventMessage::WARNING,
+            monitor->notifyDeviceEvent(new UavEventMessage(UavEventMessage::WARNING,
                                                         "Accelerometer calibration aborted.\n"
                                                         "Was preformed in non-static conditions."));
             state = IDLE;

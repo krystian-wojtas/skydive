@@ -2,14 +2,14 @@
 
 #include <iostream>
 
-std::vector<std::string> Exception::trace;
+std::vector<std::string> SkyException::trace;
 
 // dummy constructor for another types of exceptions
-Exception::Exception(void)
+SkyException::SkyException(void)
 {
 }
 
-Exception::Exception(const char* _what, const char* _time, const char* _file, const int _line) :
+SkyException::SkyException(const char* _what, const char* _time, const char* _file, const int _line) :
     whatMessage(_what)
 {
     trace.push_back(std::string(_time) + " - " +
@@ -18,12 +18,12 @@ Exception::Exception(const char* _what, const char* _time, const char* _file, co
         std::to_string(static_cast<long long>(_line)));
 }
 
-Exception::~Exception()
+SkyException::~SkyException()
 {
 }
 
 #ifdef __GNUC__
-const char* Exception::what() const noexcept
+const char* SkyException::what() const noexcept
 {
     return whatMessage.c_str();
 }
@@ -34,17 +34,17 @@ const char* Exception::what() const //noexcept
 }
 #endif
 
-const std::string& Exception::message(void) const
+const std::string& SkyException::message(void) const
 {
     return whatMessage;
 }
 
-const std::vector<std::string>& Exception::getTrace(void)
+const std::vector<std::string>& SkyException::getTrace(void)
 {
     return trace;
 }
 
-void Exception::printTrace(void)
+void SkyException::printTrace(void)
 {
     for (const std::string& tr : trace)
     {

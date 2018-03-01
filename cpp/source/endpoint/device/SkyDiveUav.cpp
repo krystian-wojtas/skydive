@@ -25,22 +25,22 @@ SkyDevice::SkyDevice(ISkyDeviceMonitor* const _monitor,
     std::srand(std::time(0));
 }
 
-void SkyDevice::pushUserUavEvent(const UserUavEvent* const userUavEvent)
+void SkyDevice::pushOperatorEvent(const OperatorEvent* const operatorEvent)
 {
-    pushUserUavEvent(std::unique_ptr<const UserUavEvent>(userUavEvent));
+    pushOperatorEvent(std::unique_ptr<const OperatorEvent>(operatorEvent));
 }
 
-void SkyDevice::pushUserUavEvent(std::unique_ptr<const UserUavEvent> userUavEvent)
+void SkyDevice::pushOperatorEvent(std::unique_ptr<const OperatorEvent> operatorEvent)
 {
-    monitor->trace("Handling user event: " + userUavEvent->toString() + " at: " + action->getName());
-    notifyUserUavEvent(action, userUavEvent.get());
+    monitor->trace("Handling user event: " + operatorEvent->toString() + " at: " + action->getName());
+    notifyOperatorEvent(action, operatorEvent.get());
 }
 
-ICommAction::Type SkyDevice::getState(void) const
+ISkyDeviceAction::Type SkyDevice::getState(void) const
 {
     if (nullptr == action)
     {
-        return ICommAction::IDLE_ACTION;
+        return ISkyDeviceAction::IDLE_ACTION;
     }
     else
     {
@@ -48,13 +48,13 @@ ICommAction::Type SkyDevice::getState(void) const
     }
 }
 
-void SkyDevice::notifyUserUavEvent(std::shared_ptr<ICommAction> actionLock,
-                                        const UserUavEvent* const userUavEvent)
+void SkyDevice::notifyOperatorEvent(std::shared_ptr<ISkyDeviceAction> actionLock,
+                                        const OperatorEvent* const operatorEvent)
 {
-    actionLock->handleUserEvent(*userUavEvent);
+    actionLock->handleUserEvent(*operatorEvent);
 }
 
-void SkyDevice::notifyReception(std::shared_ptr<ICommAction> actionLock,
+void SkyDevice::notifyReception(std::shared_ptr<ISkyDeviceAction> actionLock,
                                      const IMessage* const message)
 {
 //    monitor->trace("HandleReception with " + actionLock->getName() +
@@ -64,14 +64,14 @@ void SkyDevice::notifyReception(std::shared_ptr<ICommAction> actionLock,
     if (connectionLost)
     {
         connectionLost = false;
-        monitor->notifyUavEvent(new UavEvent(UavEvent::CONNECTION_RECOVERED));
+        monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CONNECTION_RECOVERED));
     }
 
     try
     {
         actionLock->baseHandleReception(std::unique_ptr<const IMessage>(message));
     }
-    catch (Exception e)
+    catch (SkyException e)
     {
         handleError(e.message());
     }
@@ -82,9 +82,9 @@ void SkyDevice::handleError(const std::string& message)
     monitor->trace("SkyDiveUav::handleError: " + message);
     enablePingTask(false);
     enableConnectionTimeoutTask(false);
-    std::shared_ptr<ICommAction> newAct = std::make_shared<IdleAction>(this);
+    std::shared_ptr<ISkyDeviceAction> newAct = std::make_shared<IdleAction>(this);
     action.swap(newAct);
-    monitor->notifyUavEvent(new UavEventMessage(UavEventMessage::ERROR, message));
+    monitor->notifyDeviceEvent(new UavEventMessage(UavEventMessage::ERROR, message));
     interface->disconnect();
 }
 
@@ -100,7 +100,7 @@ void SkyDevice::handlePong(const SignalData& signalData) const
     if (signalData.getParameterValue() == sentPingValue)
     {
         unsigned ping = (unsigned)(((clock() - sentPingTime) / 2.0f) + 0.5f);
-        monitor->notifyUavEvent(new UavEventConnectionStatus(
+        monitor->notifyDeviceEvent(new UavEventConnectionStatus(
                                     ping,
                                     dispatcher.getSucessfullReceptions(),
                                     dispatcher.getFailedReceptions()));
@@ -116,7 +116,7 @@ void SkyDevice::connectionTimerHandler(void)
         {
             // first time
             connectionLost = true;
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CONNECTION_LOST));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CONNECTION_LOST));
         }
     }
     receptionFeed = false;
@@ -157,7 +157,7 @@ ISkyDeviceMonitor* SkyDevice::getMonitor(void)
     return monitor;
 }
 
-void SkyDevice::startAction(ICommAction* newAction, bool immediateStart)
+void SkyDevice::startAction(ISkyDeviceAction* newAction, bool immediateStart)
 {
     monitor->trace("Starting new action: " + newAction->getName());
 
@@ -165,12 +165,12 @@ void SkyDevice::startAction(ICommAction* newAction, bool immediateStart)
     {
         std::string message = "Previous action (" + action->getName() +
                 ") not done, when performing: " + newAction->getName() + ".";
-        __RL_EXCEPTION__(message.c_str());
+    __SKY_EXCEPTION__(message.c_str());
     }
 
     action->end();
 
-    std::shared_ptr<ICommAction> newActionShared(newAction);
+    std::shared_ptr<ISkyDeviceAction> newActionShared(newAction);
     action.swap(newActionShared);
 
     if (immediateStart)

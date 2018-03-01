@@ -4,11 +4,11 @@
 #ifndef UPGRADEACTION_HPP
 #define UPGRADEACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class UpgradeAction : public ICommAction
+class UpgradeAction : public ISkyDeviceAction
 {
 public:
     UpgradeAction(Listener* const _listener);

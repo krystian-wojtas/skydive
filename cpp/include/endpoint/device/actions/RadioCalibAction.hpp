@@ -4,11 +4,11 @@
 #ifndef RADIOCALIBACTION_HPP
 #define RADIOCALIBACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class RadioCalibAction : public ICommAction
+class RadioCalibAction : public ISkyDeviceAction
 {
 public:
     RadioCalibAction(Listener* const _listener);
@@ -40,7 +40,7 @@ private:
 
     void handleReception(const IMessage& message) override;
     void handleSignalReception(const Parameter parameter) override;
-    void handleUserEvent(const UserUavEvent& event) override;
+    void handleUserEvent(const OperatorEvent& event) override;
 
     int current;
 };

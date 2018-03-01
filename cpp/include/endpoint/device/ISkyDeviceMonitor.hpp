@@ -26,12 +26,12 @@ public:
     /**
      * notifyUavEvent
      */
-    void notifyUavEvent(const UavEvent* const event);
+    void notifyDeviceEvent(const DeviceEvent* const event);
 
     /**
      * notifyUavEvent
      */
-    virtual void notifyUavEvent(std::unique_ptr<const UavEvent> event) = 0;
+    virtual void notifyDeviceEvent(std::unique_ptr<const DeviceEvent> event) = 0;
 
     /**
      * getControlDataSendingFreq
@@ -46,7 +46,7 @@ public:
     /**
      * createTimer
      */
-    virtual IAppTimer* createTimer(std::function<void(void)> exec) = 0;
+    virtual ISkyTimer* createTimer(std::function<void(void)> exec) = 0;
 
     /**
      * trace

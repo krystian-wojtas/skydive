@@ -5,7 +5,7 @@
 #include "SkyException.hpp"
 
 DisconnectAction::DisconnectAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
     state = IDLE;
 }
@@ -22,7 +22,7 @@ bool DisconnectAction::isActionDone(void) const
     return IDLE == state;
 }
 
-ICommAction::Type DisconnectAction::getType(void) const
+ISkyDeviceAction::Type DisconnectAction::getType(void) const
 {
     return DISCONNECT;
 }
@@ -34,7 +34,7 @@ std::string DisconnectAction::getStateName(void) const
     case IDLE: return "IDLE";
     case DISCONNECTING: return "DISCONNECTING";
     default:
-        __RL_EXCEPTION__("AppAction::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("AppAction::getStateName::Unexpected state");
     }
 }
 
@@ -51,6 +51,6 @@ void DisconnectAction::handleSignalReception(const Parameter parameter)
         state = IDLE;
         listener->startAction(new IdleAction(listener));
         listener->disconnectInterface();
-        monitor->notifyUavEvent(new UavEvent(UavEvent::APPLICATION_LOOP_ENDED));
+        monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::APPLICATION_LOOP_ENDED));
     }
 }

@@ -4,11 +4,11 @@
 #ifndef ESCCALIB_HPP
 #define ESCCALIB_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class EscCalibAction : public ICommAction
+class EscCalibAction : public ISkyDeviceAction
 {
 public:
     EscCalibAction(Listener* const _listener);
@@ -44,7 +44,7 @@ private:
 
     void handleReception(const IMessage& message) override;
     void handleSignalReception(const Parameter parameter) override;
-    void handleUserEvent(const UserUavEvent& event) override;
+    void handleUserEvent(const OperatorEvent& event) override;
 };
 
 #endif // ESCCALIB_HPP

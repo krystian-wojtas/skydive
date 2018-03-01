@@ -1,8 +1,8 @@
 // =========== roboLib ============
 // ===  *** BARTOSZ NAWROT ***  ===
 // ================================
-#ifndef ICOMMACTION_HPP
-#define ICOMMACTION_HPP
+#ifndef ISKYDEVICEACTION_HPP
+#define ISKYDEVICEACTION_HPP
 
 #include "IMessage.hpp"
 
@@ -13,9 +13,9 @@
 #include <atomic>
 #include <memory>
 
-class UserUavEvent;
+class OperatorEvent;
 
-class ICommAction
+class ISkyDeviceAction
 {
 public:
     enum Type
@@ -46,7 +46,7 @@ public:
 
         virtual ISkyDeviceMonitor* getMonitor(void) = 0;
 
-        virtual void startAction(ICommAction* action, bool immediateStart = true) = 0;
+        virtual void startAction(ISkyDeviceAction* action, bool immediateStart = true) = 0;
 
         virtual void onPongReception(const SignalData& pong) = 0;
 
@@ -62,8 +62,8 @@ public:
         virtual void disconnectInterface(void) = 0;
     };
 
-    ICommAction(Listener* const _listener);
-    virtual ~ICommAction(void);
+    ISkyDeviceAction(Listener* const _listener);
+    virtual ~ISkyDeviceAction(void);
 
     virtual void start(void) = 0;
     virtual void end(void);
@@ -71,7 +71,7 @@ public:
     void baseHandleReception(std::unique_ptr<const IMessage> message);
 
     virtual void handleReception(const IMessage& message) = 0;
-    virtual void handleUserEvent(const UserUavEvent& event);
+    virtual void handleUserEvent(const OperatorEvent& event);
 
     virtual bool isActionDone(void) const = 0;
 
@@ -86,8 +86,8 @@ public:
     static std::string toString(const Type type);
 
 protected:
-    static const unsigned DEFAULT_SIGNAL_TIMEOUT = 1000; // [ms]
-    static const unsigned MAX_SIGNAL_PAYLOAD_RECEPTION_ERRORS = 3; // [ms]
+    static constexpr unsigned DEFAULT_SIGNAL_TIMEOUT = 1000; // [ms]
+    static constexpr unsigned MAX_SIGNAL_PAYLOAD_RECEPTION_ERRORS = 3; // [ms]
 
     typedef SignalData::Command Command;
     typedef SignalData::Parameter Parameter;
@@ -106,7 +106,7 @@ protected:
     Command receivedSignalPayload;
     unsigned receptionErrors;
 
-    IAppTimer* signalTimer;
+    ISkyTimer* signalTimer;
 
     void baseHandleTimeout(void);
 
@@ -137,8 +137,8 @@ protected:
 
     void except(const std::string& message) const;
     void except(const std::string& message, const IMessage& received) const;
-    void except(const std::string& message, const UserUavEvent& event) const;
+    void except(const std::string& message, const OperatorEvent& event) const;
     void except(const std::string& message, const SignalData::Parameter parameter) const;
 };
 
-#endif // ICOMMACTION_HPP
+#endif // ISKYDEVICEACTION_HPP

@@ -4,11 +4,11 @@
 #ifndef FLIGHTINITIALIZATIONACTION_HPP
 #define FLIGHTINITIALIZATIONACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
 #include <atomic>
 
-class FlightInitializationAction : public ICommAction
+class FlightInitializationAction : public ISkyDeviceAction
 {
 public:
     FlightInitializationAction(Listener* const _listener);

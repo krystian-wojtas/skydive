@@ -4,9 +4,9 @@
 #ifndef IDLEACTION_HPP
 #define IDLEACTION_HPP
 
-#include "ICommAction.hpp"
+#include "ISkyDeviceAction.hpp"
 
-class IdleAction : public ICommAction
+class IdleAction : public ISkyDeviceAction
 {
 public:
     IdleAction(Listener* const _listener);
@@ -21,7 +21,7 @@ public:
 
 private:
     void handleReception(const IMessage& message) override;
-    void handleUserEvent(const UserUavEvent& event) override;
+    void handleUserEvent(const OperatorEvent& event) override;
 };
 
 #endif // IDLEACTION_HPP

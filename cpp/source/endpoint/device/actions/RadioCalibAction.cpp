@@ -5,7 +5,7 @@
 #include "OperatorEvent.hpp"
 
 RadioCalibAction::RadioCalibAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
     state = IDLE;
 }
@@ -28,7 +28,7 @@ bool RadioCalibAction::isActionDone(void) const
     return IDLE == state;
 }
 
-ICommAction::Type RadioCalibAction::getType(void) const
+ISkyDeviceAction::Type RadioCalibAction::getType(void) const
 {
     return RADIO_CALIB;
 }
@@ -46,7 +46,7 @@ std::string RadioCalibAction::getStateName(void) const
     case FINAL_COMMAND: return "FINAL_COMMAND";
     case CALIBRATION_RECEPTION: return "CALIBRATION_RECEPTION";
     default:
-        __RL_EXCEPTION__("RadioCalibAction::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("RadioCalibAction::getStateName::Unexpected state");
     }
 }
 
@@ -63,7 +63,7 @@ void RadioCalibAction::handleReception(const IMessage& message)
     case CHECK:
         if (IMessage::CONTROL_DATA == message.getMessageType())
         {
-            monitor->notifyUavEvent(new UavEventReceived(message));
+            monitor->notifyDeviceEvent(new UavEventReceived(message));
         }
         else
         {
@@ -75,9 +75,9 @@ void RadioCalibAction::handleReception(const IMessage& message)
         if (IMessage::CALIBRATION_SETTINGS == message.getMessageType())
         {
             monitor->trace("Calibration settings received, radio calibration successfull");
-            monitor->notifyUavEvent(new UavEventReceived(message));
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_RADIO_ENDED));
-            monitor->notifyUavEvent(new UavEventMessage(UavEventMessage::INFO,
+            monitor->notifyDeviceEvent(new UavEventReceived(message));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_RADIO_ENDED));
+            monitor->notifyDeviceEvent(new UavEventMessage(UavEventMessage::INFO,
                                                         "Radio receiver calibration successfull."));
             state = IDLE;
             listener->startAction(new AppAction(listener));
@@ -102,13 +102,13 @@ void RadioCalibAction::handleSignalReception(const Parameter parameter)
         {
         case SignalData::ACK:
             monitor->trace("Calibrate radio procedure started");
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_RADIO_STARTED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_RADIO_STARTED));
             state = CALIBRATION_COMMAND;
             break;
 
         case SignalData::NOT_ALLOWED:
             monitor->trace("Calibrate radio not allowed, breaking");
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_RADIO_NOT_ALLOWED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_RADIO_NOT_ALLOWED));
             state = IDLE;
             listener->startAction(new AppAction(listener));
             break;
@@ -124,7 +124,7 @@ void RadioCalibAction::handleSignalReception(const Parameter parameter)
         case SignalData::ACK:
             current++;
             monitor->trace("Calibrate radio response: ACK, chanel: " + std::to_string(current));
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_RADIO_ACK));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_RADIO_ACK));
             if (current >= 8)
             {
                 monitor->trace("Switching to CHECK");
@@ -138,7 +138,7 @@ void RadioCalibAction::handleSignalReception(const Parameter parameter)
 
         case SignalData::FAIL:
             monitor->trace("Calibrate radio response: FAIL");
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_RADIO_FAIL));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_RADIO_FAIL));
             state = CALIBRATION_COMMAND;
             break;
 
@@ -152,7 +152,7 @@ void RadioCalibAction::handleSignalReception(const Parameter parameter)
         {
         case SignalData::BREAK_ACK:
             monitor->trace("Radio calibration broken");
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_RADIO_ENDED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_RADIO_ENDED));
             state = IDLE;
             listener->startAction(new AppAction(listener));
             break;
@@ -173,8 +173,8 @@ void RadioCalibAction::handleSignalReception(const Parameter parameter)
 
         case SignalData::BREAK_FAIL:
             monitor->trace("Radio calibration final command FAIL");
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_RADIO_ENDED));
-            monitor->notifyUavEvent(new UavEventMessage(UavEventMessage::WARNING,
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_RADIO_ENDED));
+            monitor->notifyDeviceEvent(new UavEventMessage(UavEventMessage::WARNING,
                                                         "Error while safing data to internal memory."
                                                         "Calibration results discarded."));
             state = IDLE;
@@ -183,8 +183,8 @@ void RadioCalibAction::handleSignalReception(const Parameter parameter)
 
         case SignalData::BREAK_ACK:
             monitor->trace("Radio calibration final command BREAK_ACK");
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_RADIO_ENDED));
-            monitor->notifyUavEvent(new UavEventMessage(UavEventMessage::INFO,
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_RADIO_ENDED));
+            monitor->notifyDeviceEvent(new UavEventMessage(UavEventMessage::INFO,
                                                         "Calibration results discarded."));
             state = IDLE;
             listener->startAction(new AppAction(listener));
@@ -200,24 +200,24 @@ void RadioCalibAction::handleSignalReception(const Parameter parameter)
     }
 }
 
-void RadioCalibAction::handleUserEvent(const UserUavEvent& event)
+void RadioCalibAction::handleUserEvent(const OperatorEvent& event)
 {
     switch (state)
     {
     case CALIBRATION_COMMAND:
         switch (event.getType())
         {
-        case UserUavEvent::RADIO_CALIBRATION_DONE:
+        case OperatorEvent::RADIO_CALIBRATION_DONE:
             state = CALIBRATION_RESPONSE;
             sendSignal(SignalData::CALIBRATE_RADIO, SignalData::DONE);
             break;
 
-        case UserUavEvent::RADIO_CALIBRATION_SKIP:
+        case OperatorEvent::RADIO_CALIBRATION_SKIP:
             state = CALIBRATION_RESPONSE;
             sendSignal(SignalData::CALIBRATE_RADIO, SignalData::SKIP);
             break;
 
-        case UserUavEvent::RADIO_CALIBRATION_BREAK:
+        case OperatorEvent::RADIO_CALIBRATION_BREAK:
             state = BREAKING;
             sendSignal(SignalData::CALIBRATE_RADIO, SignalData::BREAK);
             break;
@@ -230,12 +230,12 @@ void RadioCalibAction::handleUserEvent(const UserUavEvent& event)
     case CHECK:
         switch (event.getType())
         {
-        case UserUavEvent::RADIO_CALIBRATION_DONE:
+        case OperatorEvent::RADIO_CALIBRATION_DONE:
             state = FINAL_COMMAND;
             sendSignal(SignalData::CALIBRATE_RADIO, SignalData::BREAK);
             break;
 
-        case UserUavEvent::RADIO_CALIBRATION_SKIP:
+        case OperatorEvent::RADIO_CALIBRATION_SKIP:
             state = FINAL_COMMAND;
             sendSignal(SignalData::CALIBRATE_RADIO, SignalData::BREAK_FAIL);
             break;

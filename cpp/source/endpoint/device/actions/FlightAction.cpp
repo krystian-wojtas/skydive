@@ -9,7 +9,7 @@
 #include <functional>
 
 FlightAction::FlightAction(Listener* const _listener, const double _controlFreq):
-    ICommAction(_listener),
+    ISkyDeviceAction(_listener),
     controlFreq(_controlFreq)
 {
     state = IDLE;
@@ -26,7 +26,7 @@ void FlightAction::start(void)
 {
     monitor->trace("Flight final start command");
     state = FLING;
-    monitor->notifyUavEvent(new UavEvent(UavEvent::FLIGHT_LOOP_STARTED));
+    monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::FLIGHT_LOOP_STARTED));
     listener->send(SignalData(SignalData::FLIGHT_LOOP, SignalData::READY));
     listener->enablePingTask(true);
     controlTimer->start(controlFreq);
@@ -37,7 +37,7 @@ bool FlightAction::isActionDone(void) const
     return IDLE == state;
 }
 
-ICommAction::Type FlightAction::getType(void) const
+ISkyDeviceAction::Type FlightAction::getType(void) const
 {
     return FLIGHT;
 }
@@ -50,7 +50,7 @@ std::string FlightAction::getStateName(void) const
     case FLING: return "FLING";
     case BREAKING: return "BREAKING";
     default:
-        __RL_EXCEPTION__("FlightAction::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("FlightAction::getStateName::Unexpected state");
     }
 }
 
@@ -72,21 +72,21 @@ void FlightAction::handleReception(const IMessage& message)
     }
 }
 
-void FlightAction::handleUserEvent(const UserUavEvent& event)
+void FlightAction::handleUserEvent(const OperatorEvent& event)
 {
     switch (state)
     {
     case FLING:
         switch (event.getType())
         {
-        case UserUavEvent::BREAK_FLIGHT_LOOP:
+        case OperatorEvent::BREAK_FLIGHT_LOOP:
             listener->enablePingTask(false);
             listener->enableConnectionTimeoutTask(false);
             state = BREAKING;
             break;
 
-        case UserUavEvent::AUTOPILOT:
-            sendAutopilotTarget(reinterpret_cast<const UserUavEventAutopilot&>(event));
+        case OperatorEvent::AUTOPILOT:
+            sendAutopilotTarget(reinterpret_cast<const OperatorEventAutopilot&>(event));
             break;
 
         default:
@@ -104,11 +104,11 @@ void FlightAction::handleRunningReception(const IMessage& message)
     switch (message.getMessageType())
     {
     case IMessage::DEBUG_DATA:
-        monitor->notifyUavEvent(new UavEventReceived(message));
+        monitor->notifyDeviceEvent(new UavEventReceived(message));
         break;
 
     case IMessage::AUTOPILOT_DATA:
-        monitor->notifyUavEvent(new UavEventReceived(message));
+        monitor->notifyDeviceEvent(new UavEventReceived(message));
         handleAutopilotReception(reinterpret_cast<const AutopilotData&>(message));
         break;
 
@@ -183,18 +183,18 @@ void FlightAction::controlTaskHandler(void)
         state = BREAKING;
     }
     listener->send(*data);
-    monitor->notifyUavEvent(new UavEventSent(*data.release()));
+    monitor->notifyDeviceEvent(new UavEventSent(*data.release()));
 }
 
 void FlightAction::flightEnded(const bool byBoard)
 {
     if (byBoard)
     {
-        monitor->notifyUavEvent(new UavEvent(UavEvent::FLIGHT_LOOP_TERMINATED));
+        monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::FLIGHT_LOOP_TERMINATED));
     }
     else
     {
-        monitor->notifyUavEvent(new UavEvent(UavEvent::FLIGHT_LOOP_ENDED));
+        monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::FLIGHT_LOOP_ENDED));
     }
     listener->enablePingTask(false);
     controlTimer->stop();
@@ -202,7 +202,7 @@ void FlightAction::flightEnded(const bool byBoard)
     listener->startAction(new AppAction(listener));
 }
 
-void FlightAction::sendAutopilotTarget(const UserUavEventAutopilot& event)
+void FlightAction::sendAutopilotTarget(const OperatorEventAutopilot& event)
 {
     monitor->trace("Sending autopilot data event");
     std::unique_ptr<AutopilotData> data(new AutopilotData());
@@ -210,7 +210,7 @@ void FlightAction::sendAutopilotTarget(const UserUavEventAutopilot& event)
     data->setTargetPosition(event.getPosition());
     data->flags().setFlagState(AutopilotData::ALTITUDE_DEFINED, false);
     listener->send(*data);
-    monitor->notifyUavEvent(new UavEventSent(*data.release()));
+    monitor->notifyDeviceEvent(new UavEventSent(*data.release()));
 }
 
 void FlightAction::sendBaseConfirmation(const AutopilotData& base)
@@ -219,5 +219,5 @@ void FlightAction::sendBaseConfirmation(const AutopilotData& base)
     std::unique_ptr<AutopilotData> data(new AutopilotData(base));
     data->setType(AutopilotData::BASE_ACK);
     listener->send(*data);
-    monitor->notifyUavEvent(new UavEventSent(*data.release()));
+    monitor->notifyDeviceEvent(new UavEventSent(*data.release()));
 }

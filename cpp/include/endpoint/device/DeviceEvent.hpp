@@ -15,7 +15,7 @@
  * UavEvent
  * =============================================================================================
  */
-class UavEvent
+class DeviceEvent
 {
 public:
     // events that can happen on UAV side
@@ -60,16 +60,16 @@ public:
 
     const Type type;
 
-    UavEvent(const Type& _type);
+    DeviceEvent(const Type& _type);
 
-    virtual ~UavEvent(void);
+    virtual ~DeviceEvent(void);
 
     Type getType(void) const;
 
     virtual std::string toString(void) const;
 };
 
-class UavEventMessage : public UavEvent
+class UavEventMessage : public DeviceEvent
 {
 public:
     enum MessageType
@@ -93,7 +93,7 @@ public:
     std::string toString(void) const;
 };
 
-class UavEventReceived : public UavEvent
+class UavEventReceived : public DeviceEvent
 {
 private:
     const IMessage& received;
@@ -108,7 +108,7 @@ public:
     std::string toString(void) const;
 };
 
-class UavEventSent : public UavEvent
+class UavEventSent : public DeviceEvent
 {
 private:
     const IMessage& sent;
@@ -123,7 +123,7 @@ public:
     std::string toString(void) const;
 };
 
-class UavEventConnectionStatus : public UavEvent
+class UavEventConnectionStatus : public DeviceEvent
 {
 private:
     const unsigned ping;
@@ -142,7 +142,7 @@ public:
     std::string toString(void) const;
 };
 
-class UavEventWhoAmI : public UavEvent
+class UavEventWhoAmI : public DeviceEvent
 {
 private:
     const CalibrationSettings::BoardType boardType;

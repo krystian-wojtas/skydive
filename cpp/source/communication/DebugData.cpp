@@ -297,7 +297,7 @@ DebugData DebugData::parseFromString(const std::string& line)
           >> battery
           ))
     {
-        __RL_EXCEPTION__("Error while parsing data.");
+        __SKY_EXCEPTION__("Error while parsing data.");
     }
     debugData.battery = (unsigned char)battery;
     return debugData;

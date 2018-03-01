@@ -5,7 +5,7 @@
 #include "OperatorEvent.hpp"
 
 MagnetCalibAction::MagnetCalibAction(Listener* const _listener):
-    ICommAction(_listener)
+    ISkyDeviceAction(_listener)
 {
     state = IDLE;
 }
@@ -22,7 +22,7 @@ bool MagnetCalibAction::isActionDone(void) const
     return IDLE == state;
 }
 
-ICommAction::Type MagnetCalibAction::getType(void) const
+ISkyDeviceAction::Type MagnetCalibAction::getType(void) const
 {
     return MAGNET_CALIB;
 }
@@ -38,7 +38,7 @@ std::string MagnetCalibAction::getStateName(void) const
     case CALIBRATION_SKIP_RESULT: return "CALIBRATION_SKIP_RESULT";
     case CALIBRATION_RECEPTION: return "IDLE";
     default:
-        __RL_EXCEPTION__("MagnetCalibAction::getStateName::Unexpected state");
+        __SKY_EXCEPTION__("MagnetCalibAction::getStateName::Unexpected state");
     }
 }
 
@@ -56,7 +56,7 @@ void MagnetCalibAction::handleReception(const IMessage& message)
     case CALIBRATION_RECEPTION:
         if (handleSignalPayloadReception(message))
         {
-            monitor->notifyUavEvent(new UavEventReceived(message));
+            monitor->notifyDeviceEvent(new UavEventReceived(message));
             state = IDLE;
             listener->startAction(new AppAction(listener));
         }
@@ -78,7 +78,7 @@ void MagnetCalibAction::handleSignalReception(const Parameter parameter)
             monitor->trace("Magnetometer calibration procedure started");
             listener->enableConnectionTimeoutTask(false);
             state = CALIBRATION;
-            monitor->notifyUavEvent(new UavEvent(UavEvent::CALIBRATE_MAGNET_STARTED));
+            monitor->notifyDeviceEvent(new DeviceEvent(DeviceEvent::CALIBRATE_MAGNET_STARTED));
             break;
 
         default:
@@ -96,7 +96,7 @@ void MagnetCalibAction::handleSignalReception(const Parameter parameter)
             break;
 
         case SignalData::FAIL:
-            monitor->notifyUavEvent(new UavEventMessage(UavEventMessage::WARNING,
+            monitor->notifyDeviceEvent(new UavEventMessage(UavEventMessage::WARNING,
                                                         "Error during solving magnetometer calibration!\n"
                                                         "Bad data acquired."));
             state = IDLE;
@@ -127,18 +127,18 @@ void MagnetCalibAction::handleSignalReception(const Parameter parameter)
 }
 
 
-void MagnetCalibAction::handleUserEvent(const UserUavEvent& event)
+void MagnetCalibAction::handleUserEvent(const OperatorEvent& event)
 {
     if (CALIBRATION == state)
     {
         switch (event.getType())
         {
-        case UserUavEvent::MAGNET_CALIB_DONE:
+        case OperatorEvent::MAGNET_CALIB_DONE:
             state = CALIBRATION_RESULT;
             sendSignal(SignalData::CALIBRATE_MAGNET, SignalData::DONE);
             break;
 
-        case UserUavEvent::MAGNET_CALIB_ABORT:
+        case OperatorEvent::MAGNET_CALIB_ABORT:
             state = CALIBRATION_SKIP_RESULT;
             sendSignal(SignalData::CALIBRATE_MAGNET, SignalData::SKIP);
             break;
