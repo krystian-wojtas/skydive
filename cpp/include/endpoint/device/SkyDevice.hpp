@@ -18,12 +18,12 @@
 #include <memory>
 #include <atomic>
 
-class SkyDiveUav :
-        public IAppCommInterface::Listener,
+class SkyDevice :
+        public ISkyCommInterface::Listener,
         public ICommAction::Listener
 {
 public:
-    SkyDiveUav(ISkyDiveMonitor* const _monitor,
+    SkyDevice(ISkyDeviceMonitor* const _monitor,
                   const double _pingFreq,
                   const double _controlFreq,
                   const double _connectionTimeout);
@@ -52,10 +52,10 @@ public:
 
 private:
     // listener for events emitted from UAV
-    ISkyDiveMonitor* const monitor;
+    ISkyDeviceMonitor* const monitor;
 
     // used communication buffer
-    IAppCommInterface* interface;
+    ISkyCommInterface* interface;
 
     // preformed UAV action
     std::shared_ptr<ICommAction> action;
@@ -104,14 +104,14 @@ private:
     void onDataReceived(const unsigned char* data, const unsigned dataSize) override;
 
     // ICommAction::Listener overrides
-    ISkyDiveMonitor* getMonitor(void) override;
+    ISkyDeviceMonitor* getMonitor(void) override;
     void startAction(ICommAction* action, bool immediateStart = true) override;
     void onPongReception(const SignalData& pong) override;
     void send(const IMessage& message) override;
     void send(const ISignalPayloadMessage& message) override;
     void enablePingTask(bool enabled) override;
     void enableConnectionTimeoutTask(bool enabled) override;
-    void connectInterface(IAppCommInterface* _interface) override;
+    void connectInterface(ISkyCommInterface* _interface) override;
     void disconnectInterface(void) override;
 };
 

@@ -44,7 +44,7 @@ public:
     public:
         virtual ~Listener(void);
 
-        virtual ISkyDiveMonitor* getMonitor(void) = 0;
+        virtual ISkyDeviceMonitor* getMonitor(void) = 0;
 
         virtual void startAction(ICommAction* action, bool immediateStart = true) = 0;
 
@@ -58,7 +58,7 @@ public:
         virtual void enablePingTask(bool enabled) = 0;
         virtual void enableConnectionTimeoutTask(bool enabled) = 0;
 
-        virtual void connectInterface(IAppCommInterface* interface) = 0;
+        virtual void connectInterface(ISkyCommInterface* interface) = 0;
         virtual void disconnectInterface(void) = 0;
     };
 
@@ -94,7 +94,7 @@ protected:
 
     // communication consumers
     Listener* const listener;
-    ISkyDiveMonitor* const monitor;
+    ISkyDeviceMonitor* const monitor;
 
     // signal timeouted communication variables
     std::atomic<bool> wasSignalReceptionProcedure;

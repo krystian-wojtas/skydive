@@ -6,7 +6,7 @@
 
 #include <string>
 
-class IAppCommInterface
+class ISkyCommInterface
 {
 public:
     class Listener
@@ -23,7 +23,7 @@ public:
         virtual void onDataReceived(const unsigned char* data, const unsigned dataSize) = 0;
     };
 
-    virtual ~IAppCommInterface(void);
+    virtual ~ISkyCommInterface(void);
 
     virtual void connect(void) = 0;
 

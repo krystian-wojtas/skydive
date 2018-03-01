@@ -54,14 +54,14 @@ public:
 class UserUavEventConnect : public UserUavEvent
 {
     ICommAction::Type connetionType;
-    IAppCommInterface* interface;
+    ISkyCommInterface* interface;
 
 public:
-    UserUavEventConnect(ICommAction::Type _connectionType, IAppCommInterface* _interface);
+    UserUavEventConnect(ICommAction::Type _connectionType, ISkyCommInterface* _interface);
 
     ICommAction::Type getConnectionType(void) const;
 
-    IAppCommInterface* getCommInnterface(void) const;
+    ISkyCommInterface* getCommInnterface(void) const;
 };
 
 class UserUavEventAction : public UserUavEvent

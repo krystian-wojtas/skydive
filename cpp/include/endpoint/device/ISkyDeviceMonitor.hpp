@@ -18,10 +18,10 @@
 /**
  * ISkyDiveMonitor
  */
-class ISkyDiveMonitor
+class ISkyDeviceMonitor
 {
 public:  
-    virtual ~ISkyDiveMonitor();
+    virtual ~ISkyDeviceMonitor();
 
     /**
      * notifyUavEvent

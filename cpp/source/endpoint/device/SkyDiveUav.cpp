@@ -9,7 +9,7 @@
 #include <stdlib.h>
 #include <functional>
 
-SkyDiveUav::SkyDiveUav(ISkyDiveMonitor* const _monitor,
+SkyDevice::SkyDevice(ISkyDeviceMonitor* const _monitor,
                                const double _pingFreq,
                                const double _controlFreq,
                                const double _connectionTimeout) :
@@ -17,26 +17,26 @@ SkyDiveUav::SkyDiveUav(ISkyDiveMonitor* const _monitor,
     pingFreq(_pingFreq),
     controlFreq(_controlFreq),
     connectionTimeoutFreq(1 / _connectionTimeout),
-    pingTimer(monitor->createTimer(std::bind(&SkyDiveUav::pingTimerHandler, this))),
-    connetionTimer(monitor->createTimer(std::bind(&SkyDiveUav::connectionTimerHandler, this)))
+    pingTimer(monitor->createTimer(std::bind(&SkyDevice::pingTimerHandler, this))),
+    connetionTimer(monitor->createTimer(std::bind(&SkyDevice::connectionTimerHandler, this)))
 {
     action = std::make_shared<IdleAction>(this);
 
     std::srand(std::time(0));
 }
 
-void SkyDiveUav::pushUserUavEvent(const UserUavEvent* const userUavEvent)
+void SkyDevice::pushUserUavEvent(const UserUavEvent* const userUavEvent)
 {
     pushUserUavEvent(std::unique_ptr<const UserUavEvent>(userUavEvent));
 }
 
-void SkyDiveUav::pushUserUavEvent(std::unique_ptr<const UserUavEvent> userUavEvent)
+void SkyDevice::pushUserUavEvent(std::unique_ptr<const UserUavEvent> userUavEvent)
 {
     monitor->trace("Handling user event: " + userUavEvent->toString() + " at: " + action->getName());
     notifyUserUavEvent(action, userUavEvent.get());
 }
 
-ICommAction::Type SkyDiveUav::getState(void) const
+ICommAction::Type SkyDevice::getState(void) const
 {
     if (nullptr == action)
     {
@@ -48,13 +48,13 @@ ICommAction::Type SkyDiveUav::getState(void) const
     }
 }
 
-void SkyDiveUav::notifyUserUavEvent(std::shared_ptr<ICommAction> actionLock,
+void SkyDevice::notifyUserUavEvent(std::shared_ptr<ICommAction> actionLock,
                                         const UserUavEvent* const userUavEvent)
 {
     actionLock->handleUserEvent(*userUavEvent);
 }
 
-void SkyDiveUav::notifyReception(std::shared_ptr<ICommAction> actionLock,
+void SkyDevice::notifyReception(std::shared_ptr<ICommAction> actionLock,
                                      const IMessage* const message)
 {
 //    monitor->trace("HandleReception with " + actionLock->getName() +
@@ -77,7 +77,7 @@ void SkyDiveUav::notifyReception(std::shared_ptr<ICommAction> actionLock,
     }
 }
 
-void SkyDiveUav::handleError(const std::string& message)
+void SkyDevice::handleError(const std::string& message)
 {
     monitor->trace("SkyDiveUav::handleError: " + message);
     enablePingTask(false);
@@ -88,14 +88,14 @@ void SkyDiveUav::handleError(const std::string& message)
     interface->disconnect();
 }
 
-void SkyDiveUav::pingTimerHandler(void)
+void SkyDevice::pingTimerHandler(void)
 {
     sentPingValue = std::rand();
     sentPingTime = clock();
     send(SignalData(SignalData::PING_VALUE, sentPingValue));
 }
 
-void SkyDiveUav::handlePong(const SignalData& signalData) const
+void SkyDevice::handlePong(const SignalData& signalData) const
 {
     if (signalData.getParameterValue() == sentPingValue)
     {
@@ -107,7 +107,7 @@ void SkyDiveUav::handlePong(const SignalData& signalData) const
     }
 }
 
-void SkyDiveUav::connectionTimerHandler(void)
+void SkyDevice::connectionTimerHandler(void)
 {
     if (false == receptionFeed)
     {
@@ -122,23 +122,23 @@ void SkyDiveUav::connectionTimerHandler(void)
     receptionFeed = false;
 }
 
-void SkyDiveUav::onConnected()
+void SkyDevice::onConnected()
 {
     monitor->trace("SkyDiveUav::onConnected");
     action->start();
 }
 
-void SkyDiveUav::onDisconnected()
+void SkyDevice::onDisconnected()
 {
     monitor->trace("SkyDiveUav::onDisconnected");
 }
 
-void SkyDiveUav::onError(const std::string& message)
+void SkyDevice::onError(const std::string& message)
 {
     handleError(message);
 }
 
-void SkyDiveUav::onDataReceived(const unsigned char* data, const unsigned dataSize)
+void SkyDevice::onDataReceived(const unsigned char* data, const unsigned dataSize)
 {
     IMessage::PreambleType receivedPreamble;
     for (unsigned i = 0; i < dataSize; i++)
@@ -152,12 +152,12 @@ void SkyDiveUav::onDataReceived(const unsigned char* data, const unsigned dataSi
     }
 }
 
-ISkyDiveMonitor* SkyDiveUav::getMonitor(void)
+ISkyDeviceMonitor* SkyDevice::getMonitor(void)
 {
     return monitor;
 }
 
-void SkyDiveUav::startAction(ICommAction* newAction, bool immediateStart)
+void SkyDevice::startAction(ICommAction* newAction, bool immediateStart)
 {
     monitor->trace("Starting new action: " + newAction->getName());
 
@@ -179,18 +179,18 @@ void SkyDiveUav::startAction(ICommAction* newAction, bool immediateStart)
     }
 }
 
-void SkyDiveUav::onPongReception(const SignalData& pong)
+void SkyDevice::onPongReception(const SignalData& pong)
 {
     handlePong(pong);
 }
 
-void SkyDiveUav::send(const IMessage& message)
+void SkyDevice::send(const IMessage& message)
 {
     message.serializeMessage(messageBuildingBuffer);
     interface->sendData(messageBuildingBuffer, message.getMessageSize());
 }
 
-void SkyDiveUav::send(const ISignalPayloadMessage& message)
+void SkyDevice::send(const ISignalPayloadMessage& message)
 {
     ISignalPayloadMessage::MessagesBuilder builder(&message);
     while (builder.hasNext())
@@ -200,7 +200,7 @@ void SkyDiveUav::send(const ISignalPayloadMessage& message)
     }
 }
 
-void SkyDiveUav::enablePingTask(bool enable)
+void SkyDevice::enablePingTask(bool enable)
 {
     if (enable)
     {
@@ -214,7 +214,7 @@ void SkyDiveUav::enablePingTask(bool enable)
     }
 }
 
-void SkyDiveUav::enableConnectionTimeoutTask(bool enable)
+void SkyDevice::enableConnectionTimeoutTask(bool enable)
 {
     if (enable)
     {
@@ -228,14 +228,14 @@ void SkyDiveUav::enableConnectionTimeoutTask(bool enable)
     }
 }
 
-void SkyDiveUav::connectInterface(IAppCommInterface* _interface)
+void SkyDevice::connectInterface(ISkyCommInterface* _interface)
 {
     interface = _interface;
     interface->setListener(this);
     interface->connect();
 }
 
-void SkyDiveUav::disconnectInterface(void)
+void SkyDevice::disconnectInterface(void)
 {
     enablePingTask(false);
     enableConnectionTimeoutTask(false);

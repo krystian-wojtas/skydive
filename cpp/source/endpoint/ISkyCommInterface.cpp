@@ -1,34 +1,34 @@
 #include "ISkyCommInterface.hpp"
 
-IAppCommInterface::Listener::~Listener(void)
+ISkyCommInterface::Listener::~Listener(void)
 {
 }
 
-IAppCommInterface::~IAppCommInterface(void)
+ISkyCommInterface::~ISkyCommInterface(void)
 {
 }
 
-void IAppCommInterface::setListener(Listener* _listener)
+void ISkyCommInterface::setListener(Listener* _listener)
 {
     listener = _listener;
 }
 
-void IAppCommInterface::onConnected(void)
+void ISkyCommInterface::onConnected(void)
 {
     listener->onConnected();
 }
 
-void IAppCommInterface::onDisconnected(void)
+void ISkyCommInterface::onDisconnected(void)
 {
     listener->onDisconnected();
 }
 
-void IAppCommInterface::onError(const std::string& message)
+void ISkyCommInterface::onError(const std::string& message)
 {
     listener->onError(message);
 }
 
-void IAppCommInterface::onDataReceived(const unsigned char* data, const unsigned dataSize)
+void ISkyCommInterface::onDataReceived(const unsigned char* data, const unsigned dataSize)
 {
     listener->onDataReceived(data, dataSize);
 }

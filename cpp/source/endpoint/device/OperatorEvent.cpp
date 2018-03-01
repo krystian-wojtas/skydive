@@ -43,7 +43,7 @@ std::string UserUavEvent::toString(void) const
     }
 }
 
-UserUavEventConnect::UserUavEventConnect(ICommAction::Type _connectionType, IAppCommInterface* _interface) :
+UserUavEventConnect::UserUavEventConnect(ICommAction::Type _connectionType, ISkyCommInterface* _interface) :
     UserUavEvent(CONNECT),
     connetionType(_connectionType),
     interface(_interface)
@@ -55,7 +55,7 @@ ICommAction::Type UserUavEventConnect::getConnectionType(void) const
     return connetionType;
 }
 
-IAppCommInterface* UserUavEventConnect::getCommInnterface(void) const
+ISkyCommInterface* UserUavEventConnect::getCommInnterface(void) const
 {
     return interface;
 }
